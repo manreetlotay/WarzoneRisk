@@ -2,14 +2,6 @@
 #include "Map.h"
 using namespace std;
 
-//  Player:: Player(/* args */)
-// {
-//     //playerName = "";                            ////////////////////////////////////////////////////UNCOMMENT
-// }
-// Player:: ~Player()
-// {
-
-// }
 
 Continent::Continent()
 {
@@ -112,8 +104,9 @@ Territory* Map::findTerritoryByName(string name){
     return (it != territoryList.end()) ? *it : nullptr; 
 }
 
-//Create DFS function to check the connection between territories
-
+// Create DFS function to check the connection between territories
+// Initial territory is added to visited list then checks edge with adjacent territories
+// by calling recursion DFS.
 void Map::DFS(Territory* territory, vector<Territory*> &visited){
     visited.push_back(territory);
     for(Territory* adj : territory->adjencyList){
@@ -153,7 +146,9 @@ bool Map::checkContinentConnections(){
 
     return visitedC.size()==continentList.size();
 }
-
+// If there is a duplicate territory with a different Continent,
+// it the program will overide it. The only error it can possibly happen is 
+// either no initialization or continent does not exist in list.
 bool Map::checkTerritoryTo1Contient(){
     for(Territory* territory: territoryList){
         if (territory->getContinent()==nullptr){
@@ -165,4 +160,8 @@ bool Map::checkTerritoryTo1Contient(){
         }
     }
     return true;
+}
+
+bool Map::Validate(){
+    return checkContinentConnections() && checkTerritoryConnections() && checkTerritoryTo1Contient();
 }
