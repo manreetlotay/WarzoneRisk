@@ -76,14 +76,28 @@ void testPlayers() {
     
     //Testing copy constructor of player
     std::cout << "Testing copy constructor" << std::endl;
-    Player player(playerDefault);
-    std::cout << player << std::endl;
+    Player playerCopy(playerDefault);
+    std::cout << playerCopy << std::endl;
 
     //Testing assignment operator of player
     std::cout << "Testing assignment operator" << std::endl;
     std::cout << player << std::endl;  //before: instantiated with parameter
     player = playerDefault;                  
     std::cout << player << std::endl;  //now: instantiated with default
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     ////////If Player objects had to be pointer this is how it would go: 
