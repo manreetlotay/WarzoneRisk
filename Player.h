@@ -16,12 +16,13 @@ class Player {
         Hand* handOfCards;
         OrderList* orderList;
         vector<Territory*> territoryList;
+        //string playerName;
 
     public:
         //constructor and destructor
         Player();
         ~Player();
-        Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList);
+        Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList);//, string playerName);
         
         //copy constructor
         Player(const Player& ogPlayer);
@@ -41,10 +42,12 @@ class Player {
         Hand* getHandOfCards();
         OrderList* getOrderList();
         vector<Territory*> getTerritoryList();
+        //string getPlayerName();
 
         //setters
         void setHand(Hand* newHandOfCards);
         void setTerritoryList(vector<Territory*> newTerritoryList);
+       // void setPlayerName(string newPlayerName);
 
         //Other
         void printTerritoryList(vector<Territory*> terrListToPrint);

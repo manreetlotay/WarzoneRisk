@@ -53,6 +53,11 @@ void testPlayers() {
     Malaysia->setNumOfArmies(10);
     India->setNumOfArmies(4);
 
+
+
+    //Set Player Name
+    //string playerName = "Jay";
+
     //Instantiate a Player object with the default constructor
     Player playerDefault;
 
@@ -61,7 +66,7 @@ void testPlayers() {
     std::cout << playerDefault << std::endl;
 
     //Instantiate a Player object with the parameterized constructor using handOfCards and orderList
-    Player player(handOfCards, orderList, territoryList);
+    Player player(handOfCards, orderList, territoryList); //, playerName);
 
     //Testing issueOrder() method
     player.issueOrder(&deploy);
@@ -78,17 +83,20 @@ void testPlayers() {
 
     std::cout << "Territories to Defend:" << std::endl;
     player.printTerritoryList(player.toDefend());
-    
+
+/*
     //Testing copy constructor of player
-    std::cout << "Testing copy constructor" << std::endl;
+    std::cout << "Testing copy constructor: " << std::endl;
     Player playerCopy(playerDefault);
     std::cout << playerCopy << std::endl;
+
+    */
 
     //Testing assignment operator of player
     std::cout << "Testing assignment operator" << std::endl;
     std::cout << player << std::endl;  //before: instantiated with parameter
     player = playerDefault;                  
-    std::cout << player << std::endl;  //now: instantiated with default
+    std::cout << player << std::endl;  //now: assigned with default
 
 
 
