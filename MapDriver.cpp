@@ -3,7 +3,6 @@
 #include <fstream>
 #include <string.h>
 #include <sstream>
-//#include <algorithm>
 
 using namespace std;
 
@@ -11,11 +10,10 @@ void testLoadMaps()
 {
     cout<<"Hello World :)";
 
-    ifstream file("Caribbean.map");
+    ifstream file("C:\\Users\\Shangirna\\source\\repos\\Project3\\x64\\Debug\\Caribbean.map");
 
     if(!file.is_open()){
         cerr << "Failed to open file :("<< endl;
-        //return 0;
     }
 
     string line;
@@ -41,7 +39,7 @@ void testLoadMaps()
             string name;
             while (!file.eof()) 
             {
-                bool flag;
+                bool flag = false;
                 while(line == ""){
                     getline(file,line); 
                     flag= file.eof();
@@ -90,8 +88,11 @@ void testLoadMaps()
             }
         }
     }
-    bool f = map.checkTerritoryConnections();
-    bool a = map.checkContinentConnections();
-    bool b = map.checkTerritoryTo1Contient();
-    //return 0;
+    bool a = map.Validate();
+    if (a == true) {
+        cout << "Map created and validated";
+    }
+    else {
+        cout << "Map not valid";
+    }
 }
