@@ -1,3 +1,8 @@
+/*
+IMEPLEMENTATION OF A WARZONE PLAYER
+AUTHOR: Manreet Kaur Lotay (40202883)
+*/
+
 #pragma once
 
 #include <string>
