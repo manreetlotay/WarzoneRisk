@@ -129,6 +129,51 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
     vector<Territory*> territoryList = player.getTerritoryList();
     //string playerName = player.getPlayerName();
 
+    output << "Player's Information: " << std::endl;
+    output << "\n";
+
+    //print player's handOfCards message if its empty
+    if (handOfCards == nullptr) {
+        output << "Player's Hand of Cards is empty" << std::endl;
+    }
+    else {
+        //Print player's hand of cards
+        output << "Player's Hand of Cards: " << std::endl;
+            // Iterate through the cards in the player's hand and print them
+            for (Card* card : handOfCards->hand) {
+                card->Play();
+            }
+    }
+
+    //print player's orderList message if its empty
+    if (orderList == nullptr) {
+        output << "Player's List of Orders is empty" << std::endl;
+    }
+    else {
+        //print player's list of orders
+        output << "Player's List of Orders: " << std::endl;
+            // Iterate through the order list and print each order's type
+            for (int i = 0; i < orderList->get_order_list()->size(); i++) {
+                output << "  " << orderList->get_order_list()->at(i)->getType() << std::endl;
+            }
+    }
+
+    //print player's territoryList message if its empty
+    if(territoryList.empty()) {
+        output << "Player Does Not Own Any Territories" << std::endl;
+    }
+    else {
+        //print player's list of territories
+        output << "Player's List of Territories:" << std::endl;
+            //Iterate through territoryList and print name of each Territory object
+            for (Territory* territory : player.territoryList) {
+                output << "Territory Name: " << territory->getTerritoryName() << std::endl;
+                //other info about territory to print...
+            }
+    }
+
+    /*
+
     //If player was instantiated using default constructor
     if ((handOfCards == nullptr) && (orderList == nullptr) && (territoryList.empty())) {
         output << "Player's Hand of Cards is empty" << std::endl;
@@ -153,6 +198,8 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
                 output << "  " << orderList->get_order_list()->at(i)->getType() << std::endl;
             }
 
+        output << "\n";
+
         //print player's list of territories
         output << "Player's List of Territories:" << std::endl;
             //Iterate through territoryList and print name of each Territory object
@@ -164,6 +211,8 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
         //print player's name
         //output << "Player's Name: " << playerName << std::endl;
     }
+
+    */
 
     return output;
 }
@@ -250,7 +299,6 @@ void Player::printTerritoryList(vector<Territory*> terrListToPrint) {
         std::cout << territory->getTerritoryName() << std::endl;
     }
 }
-
 
 
 
