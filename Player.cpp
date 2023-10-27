@@ -17,7 +17,7 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
  //destructor
  Player::~Player() {
 
-    //Deallocation memory for handOfCards, playerName and orderList and preventing dangling pointers
+    //Deallocation memory for handOfCards and orderList and preventing dangling pointers
     delete handOfCards;
     handOfCards = NULL;
 
@@ -61,25 +61,6 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
         //instantiate new territoryList
         territoryList = vector<Territory*>();
     }
-
-/*
-    //if ogPlayer was instantiated using the parameterized constructor
-     if ((ogPlayer.handOfCards != nullptr) && (ogPlayer.orderList != nullptr) && (!ogPlayer.territoryList.empty())) {
-        this->handOfCards = new Hand(*(ogPlayer.handOfCards));
-        this->orderList = new OrderList(*(ogPlayer.orderList));
-
-        //deep copy each Territory from one list to the other
-         for (Territory* territory: ogPlayer.territoryList) {
-            this->territoryList.push_back(new Territory(*territory));
-        }
-
-    //if ogPlayer was instantiated using the default constructor
-    } else {
-        this->handOfCards = nullptr;
-        this->orderList = nullptr;
-        territoryList = vector<Territory*>();
-    }
-    */
  }
 
  //assignment operator
@@ -171,48 +152,6 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
                 //other info about territory to print...
             }
     }
-
-    /*
-
-    //If player was instantiated using default constructor
-    if ((handOfCards == nullptr) && (orderList == nullptr) && (territoryList.empty())) {
-        output << "Player's Hand of Cards is empty" << std::endl;
-        output << "Player's List of Orders is empty" << std::endl;
-        output << "Player Does Not Own Any Territories" << std::endl;
-
-    //If player was instantiated using parameterized constructor
-    } else {
-        //Print player's hand of cards
-        output << "Player's Hand of Cards: " << std::endl;
-            // Iterate through the cards in the player's hand and print them
-            for (Card* card : handOfCards->hand) {
-                card->Play();
-            }
-
-        output << "\n";
-
-        //print player's list of orders
-        output << "Player's List of Orders: " << std::endl;
-            // Iterate through the order list and print each order's type
-            for (int i = 0; i < orderList->get_order_list()->size(); i++) {
-                output << "  " << orderList->get_order_list()->at(i)->getType() << std::endl;
-            }
-
-        output << "\n";
-
-        //print player's list of territories
-        output << "Player's List of Territories:" << std::endl;
-            //Iterate through territoryList and print name of each Territory object
-            for (Territory* territory : player.territoryList) {
-                output << "Territory Name: " << territory->getTerritoryName() << std::endl;
-                //other info about territory to print...
-            }
-
-        //print player's name
-        //output << "Player's Name: " << playerName << std::endl;
-    }
-
-    */
 
     return output;
 }
