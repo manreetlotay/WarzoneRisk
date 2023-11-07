@@ -61,7 +61,7 @@ void testPlayers() {
     std::cout << *playerDefault << std::endl;
 
     //Instantiate a Player object with the parameterized constructor using handOfCards and orderList
-    Player* player = new Player(handOfCards, orderList, territoryList);
+    Player* player = new Player(handOfCards, orderList, territoryList, "manreet");
 
     //Testing issueOrder() method
     player->issueOrder(&deploy);

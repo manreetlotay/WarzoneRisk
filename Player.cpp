@@ -7,12 +7,12 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 #include <iostream>
 
 // default constructor
-Player::Player() : handOfCards(nullptr), orderList(nullptr), territoryList(vector<Territory*>()) {} //, playerName("NoName"){}
+Player::Player() : handOfCards(nullptr), orderList(nullptr), territoryList(vector<Territory*>()), playerID("default"){}
 
 
 //Parameterized Constructor
-Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList) //, string playerName)
-    : handOfCards(handOfCards), orderList(orderList), territoryList(territoryList) {}//, playerName(playerName) {}
+Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList, string playerID)
+    : handOfCards(handOfCards), orderList(orderList), territoryList(territoryList), playerID(playerID) {}
 
  //destructor
  Player::~Player() {
@@ -61,6 +61,9 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
         //instantiate new territoryList
         territoryList = vector<Territory*>();
     }
+
+    //copying playerID
+    this->playerID = ogPlayer.playerID;
  }
 
  //assignment operator
@@ -99,6 +102,9 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
         territoryList = vector<Territory*>();
     }
 
+    //copying playerID
+    this->playerID = player.playerID;
+
     return *this;
  }
 
@@ -108,10 +114,13 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
     Hand* handOfCards = player.getHandOfCards();
     OrderList* orderList = player.getOrderList();
     vector<Territory*> territoryList = player.getTerritoryList();
-    //string playerName = player.getPlayerName();
+    string playerID = player.getPlayerID();
 
     output << "Player's Information: " << std::endl;
     output << "\n";
+
+    //print player's id
+    output << "Player ID: " << playerID << std::endl;
 
     //print player's handOfCards message if its empty
     if (handOfCards == nullptr) {
@@ -169,9 +178,9 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
     return territoryList;
  };
 
-//  string Player::getPlayerName() {
-//     return playerName;
-//  }
+ string Player::getPlayerID() {
+    return playerID;
+ }
 
  //setters
  void Player::setHand(Hand* newHandOfCards) {
@@ -182,9 +191,9 @@ void Player::setTerritoryList(vector<Territory*> newTerritoryList) {
     territoryList = newTerritoryList;
 }
 
-// void Player::setPlayerName(string newPlayerName) {
-//     playerName = newPlayerName;
-// }
+void Player::setPlayerID(string newPlayerID) {
+    playerID = newPlayerID;
+}
 
 //create Order object and add it to player's list of orders
 void Player::issueOrder(Order* order) {

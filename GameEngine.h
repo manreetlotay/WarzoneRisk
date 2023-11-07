@@ -27,9 +27,13 @@ public:
     void executeOrders(string&);
     bool win();
 
-
+    void mainGameLoop();
+    void reinforcementPhase();
+    void issueOrdersPhase();
+    void executeOrdersPhase();
 
 };
 
 //free function
 void testGameStates();
+void testMainGameLoop();
