@@ -182,6 +182,10 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
     return playerID;
  }
 
+ int Player::getReinforcementPool() {
+    return reinforcementPool;
+ }
+
  //setters
  void Player::setHand(Hand* newHandOfCards) {
     handOfCards = newHandOfCards;
@@ -193,6 +197,10 @@ void Player::setTerritoryList(vector<Territory*> newTerritoryList) {
 
 void Player::setPlayerID(string newPlayerID) {
     playerID = newPlayerID;
+}
+
+void Player::setReinforcementPool(int newReinforcementPool) {
+    reinforcementPool = newReinforcementPool;
 }
 
 //create Order object and add it to player's list of orders

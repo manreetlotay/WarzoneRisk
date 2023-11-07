@@ -44,11 +44,13 @@ class Player {
         OrderList* getOrderList();
         vector<Territory*> getTerritoryList();
         string getPlayerID();
+        int getReinforcementPool();
 
         //setters
         void setHand(Hand* newHandOfCards);
         void setTerritoryList(vector<Territory*> newTerritoryList);
         void setPlayerID(string newPlayerID);
+        void setReinforcementPool(int newReinforcementPool);
 
         //Other
         void printTerritoryList(vector<Territory*> terrListToPrint);
