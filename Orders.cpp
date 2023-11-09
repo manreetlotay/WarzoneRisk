@@ -39,7 +39,7 @@ string Order::getType()
     return vecType.at(typeID);
 }
 
-std :: ostream& operator<<(std::ostream& output, const Order &order){
+std::ostream& operator<<(std::ostream& output, const Order& order) {
     cout << "Object order"<< endl;
     if (order.valid){
         cout << "Order attribute"<< endl;
