@@ -189,6 +189,7 @@ Bomb::Bomb()
 
 Bomb::~Bomb()
 {
+
 }
 std :: ostream& operator<<(std::ostream& output, const Bomb &bomb){
     cout << "Object Bomb"<< endl;
