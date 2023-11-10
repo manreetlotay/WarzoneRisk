@@ -111,6 +111,7 @@ std :: ostream& operator<<(std::ostream& output, const OrderList &orderList){
         cout<<to_string(i)<< endl;
         cout<<*obj<<endl;
     }
+    return output;
 }
 
 Deploy::Deploy()

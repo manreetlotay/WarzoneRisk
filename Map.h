@@ -63,7 +63,7 @@ public:
     vector<Territory*>territoryList; // List points to existing territory objects
     Continent* findContinentByName(string name); // Find and return Continent from continentList
     Territory* findTerritoryByName(string name);
-    bool Validate();
+    void Validate();
     void DFS(Territory*,vector<Territory*>&);
     void DFS1(Territory*, vector<Territory*>&, vector<Continent*>&);
     bool checkTerritoryConnections();
