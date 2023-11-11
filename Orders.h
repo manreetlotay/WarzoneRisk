@@ -167,4 +167,3 @@ private:
 };
 
 
-#endif //TEST_ORDERTEST_H

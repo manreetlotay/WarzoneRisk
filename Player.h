@@ -20,6 +20,7 @@ class Player {
         vector<Territory*> territoryList;
         string playerID;
         int reinforcementPool;
+        std::vector<Player*> diplomaticRelations;
 
     public:
         //constructor and destructor
@@ -47,6 +48,9 @@ class Player {
         vector<Territory*> getTerritoryList();
         string getPlayerID();
         int getReinforcementPool();
+
+        std::vector<Player*> getDiplomaticRelations() const;
+        void addDiplomaticRelation(Player* player);
 
         //setters
         void setHand(Hand* newHandOfCards);

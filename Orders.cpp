@@ -29,12 +29,13 @@ namespace
 
         if (diplomacyWithOwnerOfTarget)
         {
-            cout << attacker->getPlayerName() << " and " << ownerOfTarget << " cannot attack each other for the rest of this turn. ";
+            cout << attacker->getPlayerID() << " and " << ownerOfTarget << " cannot attack each other for the rest of this turn. ";
         }
 
         return attacker == ownerOfTarget || !diplomacyWithOwnerOfTarget;
     }
 }
+
 
 Order::Order(): issuePlayer(nullptr), priority(4) {}
 
@@ -258,21 +259,17 @@ bool Advance::validate() const
         return false;
     }
 
+
     vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
+    bool hasAdjacent = source->isAdjacent(source, target);
     bool validSourceTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), source) != currentPlayerTerritories.end();
     bool hasAnyArmiesToAdvance = source->getNumOfArmies() > 0;
-
-    return validSourceTerritory && hasAnyArmiesToAdvance && canAttack(issuePlayer, target);
+    return validSourceTerritory && hasAnyArmiesToAdvance && canAttack(issuePlayer, target) && hasAdjacent;
 }
 
 // Executes the AdvanceOrder.
 void Advance::execute_()
 {
-
-    if (!map->isAdjacent(source->getTerritoryName(), target->getTerritoryName())) {
-        std::cout << "Advance order is invalid - territories are not adjacent." << std::endl;
-        return;
-    }
 
     Player* defender = target->getTerritoryOwner();
     bool offensive = issuePlayer != defender;
@@ -309,7 +306,7 @@ void Advance::execute_()
         {
             auto pos = std::find(defender->getTerritoryList().begin(), defender->getTerritoryList().end(), target->getTerritoryName());
             issuePlayer->getTerritoryList().push_back(target);
-            defender->getTerritoryList().erase(defender->getTerritoryList().begin() + pos);
+            defender->getTerritoryList().erase(defender->getTerritoryList().begin()+pos);
             target->setNumOfArmies(target->getNumOfArmies()+survivingAttackers);
             cout << "Successful attack on " << target->getTerritoryName() << ". " << survivingAttackers << " armies now occupy this territory." << endl;
         }
@@ -362,10 +359,10 @@ bool Bomb::validate() const
     {
         return false;
     }
-
+    bool isAdjacent = source->isAdjacent(issuePlayer, target);
     vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
     bool validTargetTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), target) == currentPlayerTerritories.end();
-    return validTargetTerritory && canAttack(issuePlayer, target);
+    return validTargetTerritory && canAttack(issuePlayer, target) && isAdjacent;
 }
 
 // Executes the BombOrder.
@@ -425,9 +422,9 @@ bool Blockade::validate() const
 void Blockade::execute_()
 {
     territory->setNumOfArmies(territory->getNumOfArmies());
-    GameEngine::assignToNeutralPlayer(territory_);
-    cout << "Blockade called on " << territory_->getName() << ". ";
-    cout << territory_->getNumberOfArmies() << " neutral armies now occupy this territory." << endl;
+    territory->setTerritoryOwner(nullptr); // Neutral
+    cout << "Blockade called on " << territory->getTerritoryOwner()->getPlayerID() << ". ";
+    cout << territory->getNumOfArmies() << " neutral armies now occupy this territory." << endl;
 }
 
 Airlift::Airlift() : Order(nullptr, 2), numberOfArmy(0), source(nullptr), target(nullptr) {}
@@ -513,7 +510,7 @@ ostream &Negotiate::print_(ostream &output) const
 
     if (issuePlayer != nullptr && targetPlayer != nullptr)
     {
-        output << " Initiator: " << issuePlayer->getPlayerName() << ", Target: " << targetPlayer->getPlayerName();
+        output << " Initiator: " << issuePlayer->getPlayerID() << ", Target: " << targetPlayer->getPlayerID();
     }
 
     return output;
@@ -541,7 +538,7 @@ void Negotiate::execute_()
 {
     issuePlayer->addDiplomaticRelation(targetPlayer);
     targetPlayer->addDiplomaticRelation(issuePlayer);
-    cout << "Negotiated diplomacy between " << issuePlayer->getPlayerName()<< " and " << targetPlayer->getPlayerName() << "." << endl;
+    cout << "Negotiated diplomacy between " << issuePlayer->getPlayerID()<< " and " << targetPlayer->getPlayerID() << "." << endl;
 }
 
 

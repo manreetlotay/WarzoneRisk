@@ -33,6 +33,16 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
     territoryList.clear();
  }
 
+std::vector<Player*> Player::getDiplomaticRelations() const
+{
+    return diplomaticRelations;
+}
+
+void Player::addDiplomaticRelation(Player* player)
+{
+    diplomaticRelations.push_back(player);
+}
+
  //copy constructor
  Player::Player(const Player& ogPlayer) {
 
