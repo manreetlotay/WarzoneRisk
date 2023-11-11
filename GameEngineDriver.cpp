@@ -13,6 +13,5 @@ void testGameStates() {
 
     GameEngine game;
     game.startupPhase();
-    game.reinforcementPhase();
-    game.issueOrdersPhase();
+    game.mainGameLoop();
 }

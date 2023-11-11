@@ -235,7 +235,7 @@ void Player::issueOrder() {
     cout << playerID << ",  HERE ARE THE TERRITORIES YOU NEED TO DEFEND:\n" << endl;
 
     for (int i = 0; i < toDefend.size(); i++) {
-        cout << i + 1 << ". TERRITORY: "  << toDefend[i]->getTerritoryName() << setw(25) << " (ARMIES: " << toDefend[i]->getNumOfArmies() << ")\n";
+        cout << i + 1 << ". TERRITORY: "  << toDefend[i]->getTerritoryName() << " (ARMIES: " << toDefend[i]->getNumOfArmies() << ")\n";
     }
     cout << endl;
 
@@ -250,7 +250,7 @@ void Player::issueOrder() {
             // Prompt the user to enter the number of army units to deploy
             int numDeployed;
             do {
-                cout << "SELECT THE NUMBER OF TROOPS YOU WISH TO DEPLOY FOR " << targetTerritory->getTerritoryName() << " (NUMBER OF ARMY UNITS AVAILABLE: " << this->reinforcementPool << "): " << endl;
+                cout << "SELECT THE NUMBER OF TROOPS YOU WISH TO DEPLOY ON " << targetTerritory->getTerritoryName() << " (NUMBER OF ARMY UNITS AVAILABLE: " << this->reinforcementPool << "): " << endl;
                 cin >> numDeployed;
 
                 if (numDeployed < 0 || numDeployed > this->reinforcementPool) {
@@ -290,7 +290,7 @@ void Player::issueOrder() {
 //***********ADVANCE***********************
 
  char ynAdvanceOrder;
-    cout << playerID << "DO YOU WISH TO ISSUE ADVANCE ORDERS (Y/N)?" << endl;
+    cout << playerID << ", DO YOU WISH TO ISSUE ADVANCE ORDERS (Y/N)?" << endl;
     cin >> ynAdvanceOrder;
     cin.ignore();
 
@@ -440,32 +440,34 @@ void Player::issueOrder() {
 
     //*************************DRAW CARD*******************
 
+    cout << "\n" << endl;
+
     // Check if the player has any cards in their hand
     if (handOfCards == nullptr || handOfCards->hand.empty()) {
-        cout << playerID << ", you don't have any cards in your hand. Ending your order phase." << endl;
+        cout << playerID << ", YOU DO NOT HAVE ANY CARDS IN YOUR HANDS.\n" << endl;
         return;
     }
 
-    cout << "Here are the cards in your hand:" << endl;
+    cout << "HERE ARE THE CARDS IN YOUR HAND" << endl;
         for (int i = 0; i < handOfCards->hand.size(); i++) {
             cout << i + 1 << ". " << *handOfCards->hand[i] << endl;
         }
 
         int cardChoice;
         do {
-            cout << "Choose the card you want to use (1-" << handOfCards->hand.size() << "): ";
+            cout << "CHOOSE THE CARD YOU WANT TO USE (1-" << handOfCards->hand.size() << "): ";
             cin >> cardChoice;
             cin.ignore();
 
             if (cardChoice < 1 || cardChoice > handOfCards->hand.size()) {
-                cout << "Invalid card choice. Please try again." << endl;
+                cout << "**Invalid card choice. Please try again.**" << endl;
             }
         } while (cardChoice < 1 || cardChoice > handOfCards->hand.size());
 
         Card* selectedCard = handOfCards->hand[cardChoice - 1];
 
         //Play the Card
-        // Use the selected card based on its type
+        //Use the selected card based on its type
         switch (selectedCard->getValue()) {
             case 'B':
                 // Implement the Bomb card logic here

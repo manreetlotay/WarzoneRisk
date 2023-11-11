@@ -41,3 +41,5 @@ class GameEngine {
 //free function
 void testGameStates();
 void testMainGameLoop();
+void removePlayersWithZeroTerritories();
+Player* checkForWinner();

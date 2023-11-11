@@ -18,6 +18,7 @@ play
 //Initialize variables
         Map selectedMap;
         vector<Player*> allPlayers;
+        int numDistributedTerritories = 0;
         int numPlayers;
         vector<string> playerNames;
         vector<string> mapNames = { "maps/Canada.map", "maps/Caribbean.map" };
@@ -432,11 +433,7 @@ string GameEngine::getCommand() {
     return *userInput;
 
 }
-//void GameEngine::verifyCommand() {
-//	const vector<string> commandList = { "loadmap","validatemap","addplayer","assigncountries","issueorder","endexecorders","execorder","win","play" };
-//    
-//    
-//}
+
 
 void GameEngine::startupPhase() {
 
@@ -530,6 +527,7 @@ void GameEngine::startupPhase() {
             //Set the owner for each territory
             for (Territory* territory : playerTerritories) {
                 territory->setTerritoryOwner(allPlayers[i]);
+                numDistributedTerritories++;
             }
 
             allPlayers[i]->setTerritoryList(playerTerritories);
@@ -608,55 +606,6 @@ void GameEngine::startupPhase() {
     
 }
 
-void GameEngine::mainGameLoop() {
-    // void mainGameLoop() {
-
-//     // Variable to keep track of the current turn
-//     int turnCounter = 0;
-
-//     // Variable to limit the maximum number of game loops
-//     int maxGameLoops = 50;
-
-//     // Main game loop
-//     while (true) {
-//         // Check if a player has won by owning all territories
-//         Player* winningPlayer = checkForWin(allPlayers);
-//         if (winningPlayer != nullptr) {
-//             cout << "Congratulations, " << winningPlayer->getPlayerID() << " has won the game!" << endl;
-//             break;
-//         }
-
-//         // Check for players with no territories and remove them
-//         removePlayersWithNoTerritories(allPlayers);
-
-//         // Check if the maximum number of game loops is reached
-//         if (turnCounter >= maxGameLoops) {
-//             cout << "The game has ended in a draw." << endl;
-//             break;
-//         }
-
-//         // Get the current player for the current turn
-//         Player* currentPlayer = allPlayers[turnCounter % numPlayers];
-
-//         // Subphase 1: Reinforcement Phase
-//         reinforcementPhase(currentPlayer);
-
-//         // Subphase 2: Issue Orders Phase
-//         issueOrdersPhase(currentPlayer);
-
-//         // Subphase 3: Execute Orders Phase
-//         executeOrdersPhase(currentPlayer);
-
-//         // Increment the turn counter
-//         turnCounter++;
-//     }
-
-// }
-    
-
-   
-}
-
 void GameEngine::reinforcementPhase() {
 
             cout << "ADDITIONAL ARMY UNITS ARE ON THE WAY, ENHANCING YOUR FORCES FOR THE BATTLES AHEAD. GET READY!" << endl;
@@ -685,7 +634,7 @@ void GameEngine::reinforcementPhase() {
 
 void GameEngine::issueOrdersPhase() {
 
-    cout << "WARRIORS, IT'S TIME TO ISSUE YOUR COMMANDS, ONE BY ONE\n" << endl;
+    cout << "\nIT'S TIME TO ISSUE YOUR COMMANDS\n" << endl;
     cout << "  O" << endl;
     cout << " /|\\" << endl;
     cout << " / \\" << endl;
@@ -701,6 +650,64 @@ void GameEngine::issueOrdersPhase() {
 }
 
 void GameEngine::executeOrdersPhase() {
-    
+
+    cout << "Execution phase" << endl;    
 }
 
+
+Player* checkForWinner() {
+    //Iterate through all players and check if any player owns all territories
+    for (Player* player : allPlayers) {
+        if (player->getTerritoryList().size() == numDistributedTerritories) {
+            return player;
+        }
+    }
+
+    return nullptr; // No winner yet
+}
+
+void removePlayersWithZeroTerritories() {
+    vector<Player*> survivingPlayers;
+    
+    for (Player* player : allPlayers) {
+        if (!player->getTerritoryList().empty()) {
+            survivingPlayers.push_back(player);
+        } else {
+            cout << "Player " << player->getPlayerID() << " has been eliminated." << endl;
+        }
+    }
+
+    allPlayers = survivingPlayers; // Update the player list
+}
+
+
+void GameEngine::mainGameLoop() {
+
+    int maxRounds = 3;
+    int currentRound = 0;
+    Player* winner = nullptr;
+
+    while (currentRound < maxRounds) {
+        reinforcementPhase();  // Implement this function
+        issueOrdersPhase();    // Implement this function
+        executeOrdersPhase(); // Implement this function
+
+        // Check for a winner
+        winner = checkForWinner();
+        if (winner) {
+            cout << "Player " << winner->getPlayerID() << " wins!" << endl;
+            break;
+        }
+
+        // Check for players with zero territories
+        removePlayersWithZeroTerritories();
+
+        currentRound++;
+    }
+
+    if (!winner) {
+        cout << "The game ends in a tie. No winner." << endl;
+    } 
+
+   
+}

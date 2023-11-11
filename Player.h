@@ -21,6 +21,7 @@ class Player {
         string playerID;
         int reinforcementPool;
 
+
     public:
         //constructor and destructor
         Player();
