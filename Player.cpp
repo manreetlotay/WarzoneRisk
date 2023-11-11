@@ -222,24 +222,26 @@ void Player::issueOrder() {
 
     vector<Territory*> toDefend = this->toDefend();
     vector<Territory*> toAttack = this->toAttack();
+    bool deployedAll = false;
 
-    // Ensure the player still has territories to defend
+    //Ensure the player still has territories to defend
     if (toDefend.empty() || this->reinforcementPool <= 0) {
         return;
     }
 
-    bool deployedAll = false;
+    //********DEPLOY*********//
 
-    // Display territories to defend and the number of armies on each territory
-    cout << playerID << ", here are the territories you need to defend and the current number of armies on each:\n";
+    //Display territories to defend and the number of armies on each territory
+    cout << playerID << ",  HERE ARE THE TERRITORIES YOU NEED TO DEFEND:\n" << endl;
+
     for (int i = 0; i < toDefend.size(); i++) {
-        cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << " (Number of Armies: " << toDefend[i]->getNumOfArmies() << ")\n";
+        cout << i + 1 << ". TERRITORY: "  << toDefend[i]->getTerritoryName() << setw(25) << " (ARMIES: " << toDefend[i]->getNumOfArmies() << ")\n";
     }
     cout << endl;
 
     while (!deployedAll) {
-        cout << "You currently have " << this->reinforcementPool << " army units in your reinforcement pool.\n" << endl;
-        deployedAll = true; // Assume they deploy all available armies
+        //cout << "You currently have " << this->reinforcementPool << " army units in your reinforcement pool.\n" << endl;
+        deployedAll = true; 
 
         // Loop through the territories to defend
         for (int i = 0; i < toDefend.size(); i++) {
@@ -248,11 +250,11 @@ void Player::issueOrder() {
             // Prompt the user to enter the number of army units to deploy
             int numDeployed;
             do {
-                cout << "Select the number of troops you wish to deploy for " << targetTerritory->getTerritoryName() << " (Number of army units available: " << this->reinforcementPool << "): ";
+                cout << "SELECT THE NUMBER OF TROOPS YOU WISH TO DEPLOY FOR " << targetTerritory->getTerritoryName() << " (NUMBER OF ARMY UNITS AVAILABLE: " << this->reinforcementPool << "): " << endl;
                 cin >> numDeployed;
 
                 if (numDeployed < 0 || numDeployed > this->reinforcementPool) {
-                    cout << "Invalid number of army units. Please try again.\n" << endl;
+                    cout << "**Invalid number of army units. Please try again.**\n" << endl;
                 }
             } while (numDeployed < 0 || numDeployed > this->reinforcementPool);
 
@@ -277,65 +279,62 @@ void Player::issueOrder() {
         }
 
         if (deployedAll) {
-            cout << "You've deployed all your available armies. Ending deployment phase.\n" << endl;
+            cout << "GREAT JOB! ALL YOUR ARMY UNITS HAVE BEEN DEPLOYED!\n" << endl;
         } else {
-            cout << "You still have army units in your reinforcement pool. You need to deploy your armies to defend your territories. Please have a look at your territories to defend again and deploy your armies.\n" << endl;
+            cout << "YOU STILL HAVE ARMY UNITS IN YOUR REINFORCEMENT POOL. YOU NEED TO DEPLOY YOUR ARMIES TO DEFEND YOUR TERRITORIES. PLEASE HAVE ANOTHER LOOK AT THE TERRITORIES YOU NEED TO DEFEND AND DEPLOY YOUR ARMIES UNITS.\n" << endl;
         }
     }
 
 
 
-
-//advance order
-
-
-
-
-
+//***********ADVANCE***********************
 
  char ynAdvanceOrder;
-    cout << playerID << " Do you wish to issue advance orders (y/n)? ";
+    cout << playerID << "DO YOU WISH TO ISSUE ADVANCE ORDERS (Y/N)?" << endl;
     cin >> ynAdvanceOrder;
     cin.ignore();
 
-    if (ynAdvanceOrder == 'y') {
+    if (ynAdvanceOrder == 'y' || ynAdvanceOrder == 'Y') {
         int numAdvanceOrders;
+        cout << "\n" << endl;
         do {
-            cout << "How many advance orders would you like to issue (1-5)? ";
+            cout << "HOW MANY ADVANCE ORDERS WOULD YOU LIKE TO ISSUE (1-5)? " << endl;
             cin >> numAdvanceOrders;
             cin.ignore(); // Consume the newline character
 
             if (numAdvanceOrders < 1 || numAdvanceOrders > 5) {
-                cout << "Invalid number of advance orders. Must be between 1 and 5." << endl;
+                cout << "**Invalid number of advance orders. Must be between 1 and 5.**" << endl;
             }
         } while (numAdvanceOrders < 1 || numAdvanceOrders > 5);
 
+        cout << "\n" << endl;
+
         for (int orderNumber = 1; orderNumber <= numAdvanceOrders; orderNumber++) {
-            cout << "Advance Order #" << orderNumber << ":\n";
+            cout << "ADVANCE ORDER #" << orderNumber << ":\n" << endl;
 
             int choice;
             do {
-                cout << "Choose the type of advance order:\n";
-                cout << "1. Advance units to your territory\n";
-                cout << "2. Advance units to an enemy territory\n";
+                cout << "CHOOSE THE TYPE OF ADVANCE ORDER:" << endl;
+                cout << "1. ADVANCE UNITS TO YOUR TERRITORY" << endl;
+                cout << "2. ADVANCE UNITS TO AN ENEMY TERRITORY\n" << endl;
                 cin >> choice;
                 cin.ignore(); // Consume the newline character
             } while (choice != 1 && choice != 2);
 
             if (choice == 1) { // Advance units to your territory
                 // Display the territories to defend
-                cout << "Here is a list of your territories:\n";
+                cout << "HERE IS A LIST OF YOUR TERRITORIES:\n" << endl;
                 for (int i = 0; i < toDefend.size(); i++) {
-                    cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << "Armies: " << toDefend[i]->getNumOfArmies() << "\n";
+                    cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << "   Armies: " << toDefend[i]->getNumOfArmies() << endl;
                 }
                 int fromChoice;
                 do {
-                    cout << "Choose the source territory (1-" << toDefend.size() << "): ";
+                    cout << "CHOOSE THE SOURCE TERRITORY (1-" << toDefend.size() << "): " << endl;
                     cin >> fromChoice;
                     cin.ignore(); // Consume the newline character
 
                     if (fromChoice < 1 || fromChoice > toDefend.size()) {
-                        cout << "Invalid territory choice. Please try again." << endl;
+                        cout << "**Invalid territory choice. Please try again.**" << endl;
                     }
                 } while (fromChoice < 1 || fromChoice > toDefend.size() || toDefend[fromChoice-1]->getNumOfArmies() == 0);
 
@@ -345,12 +344,12 @@ void Player::issueOrder() {
 
                 int toChoice;
                 do {
-                    cout << "Choose the target territory (1-" << toDefend.size() << "): ";
+                    cout << "CHOOSE THE TARGET TERRITORY (1-" << toDefend.size() << "): " << endl;
                     cin >> toChoice;
                     cin.ignore(); // Consume the newline character
 
                     if (toChoice < 1 || toChoice > toDefend.size()) {
-                        cout << "Invalid territory choice. Please try again." << endl;
+                        cout << "**Invalid territory choice. Please try again.**" << endl;
                     }
                 } while (toChoice < 1 || toChoice > toDefend.size());
 
@@ -359,12 +358,12 @@ void Player::issueOrder() {
 
                 int numUnitsToAdvance;
                 do {
-                    cout << "Enter the number of units to advance (1-" << fromTerritory->getNumOfArmies() << "): ";
+                    cout << "ENTER THE NUMBER OF ARMY UNITS TO ADVANCE (1-" << fromTerritory->getNumOfArmies() << "): ";
                     cin >> numUnitsToAdvance;
                     cin.ignore(); // Consume the newline character
 
                     if (numUnitsToAdvance < 1 || numUnitsToAdvance > fromTerritory->getNumOfArmies()) {
-                        cout << "Invalid number of units to advance. Please try again." << endl;
+                        cout << "**Invalid number of army units to advance. Please try again.**" << endl;
                     }
                 } while (numUnitsToAdvance < 1 || numUnitsToAdvance > fromTerritory->getNumOfArmies());
 
@@ -372,15 +371,15 @@ void Player::issueOrder() {
                 // addOrderToOrderList(advanceOrder);
                 // fromTerritory->setNumOfArmies(fromTerritory->getNumOfArmies() - numUnitsToAdvance);
 
-                cout << "Advance Order #" << orderNumber << " issued. " << numUnitsToAdvance << " units advanced from " << fromTerritory->getTerritoryName() << " to " << toTerritory->getTerritoryName() << "." << endl;
+                cout << "\nADVANCE ORDER #" << orderNumber << " ISSUED: " << numUnitsToAdvance << " units advanced from " << fromTerritory->getTerritoryName() << " to " << toTerritory->getTerritoryName() << "." << endl;
             
             
             } else { // Advance units to an enemy territory
 
                 // Display the territories to defend
-                cout << "Here is a list of your territories:\n";
+                cout << "HERE IS A LIST OF YOUR TERRITORIES:\n" << endl;
                 for (int i = 0; i < toDefend.size(); i++) {
-                    cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << "Armies: " << toDefend[i]->getNumOfArmies() << "\n";
+                    cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << "      Armies: " << toDefend[i]->getNumOfArmies() << endl;
                 }
 
 
@@ -388,30 +387,30 @@ void Player::issueOrder() {
                 int enemyChoice;
 
                 do {
-                    cout << "Choose the source territory (1-" << toDefend.size() << "): ";
+                    cout << "CHOOSE THE SOURCE TERRITORY (1-" << toDefend.size() << "): " << endl;
                     cin >> fromChoice;
                     cin.ignore(); // Consume the newline character
 
                     if (fromChoice < 1 || fromChoice > toDefend.size()) {
-                        cout << "Invalid territory choice. Please try again." << endl;
+                        cout << "**Invalid territory choice. Please try again.**" << endl;
                     }
                 } while (fromChoice < 1 || fromChoice > toDefend.size() || toDefend[fromChoice-1]->getNumOfArmies() == 0);
 
                 // Select the source 'from' territory
                 Territory* fromTerritory = toDefend[fromChoice - 1];
 
-                cout << "Here is a list of enemy territories to attack:\n";
+                cout << "HERE IS A LIST OF ENEMY TERRITORIES TO ATTACK:\n" << endl;
                 for (int i = 0; i < toAttack.size(); i++) {
-                    cout << i + 1 << ". Territory Name: " << toAttack[i]->getTerritoryName() << " ( Owner: " << toAttack[i]->getTerritoryOwner()->getPlayerID() << " )\n";
+                    cout << i + 1 << ". Territory Name: " << toAttack[i]->getTerritoryName() << "     Owner: " << toAttack[i]->getTerritoryOwner()->getPlayerID() << endl;
                 }
 
                 do {
-                    cout << "Choose the enemy territory to attack (1-" << toAttack.size() << "): ";
+                    cout << "CHOOSE AN ENEMY TERRITORY TO ATTACK (1-" << toAttack.size() << "): " << endl;
                     cin >> enemyChoice;
                     cin.ignore(); // Consume the newline character
 
                     if (enemyChoice < 1 || enemyChoice > toAttack.size()) {
-                        cout << "Invalid territory choice. Please try again." << endl;
+                        cout << "**Invalid territory choice. Please try again.**" << endl;
                     }
                 } while (enemyChoice < 1 || enemyChoice > toAttack.size());
 
@@ -421,12 +420,12 @@ void Player::issueOrder() {
                 int numUnitsToAdvance;
 
                 do {
-                    cout << "Enter the number of units to advance (1-" << fromTerritory->getNumOfArmies() << "): ";
+                    cout << "ENTER THE NUMBER OF UNITS TO ADVANCE (1-" << fromTerritory->getNumOfArmies() << "): " << endl;
                     cin >> numUnitsToAdvance;
                     cin.ignore(); // Consume the newline character
 
                     if (numUnitsToAdvance < 1 || numUnitsToAdvance > fromTerritory->getNumOfArmies()) {
-                        cout << "Invalid number of units to advance. Please try again." << endl;
+                        cout << "**Invalid number of units to advance. Please try again.**" << endl;
                     }
                 } while (numUnitsToAdvance < 1 || numUnitsToAdvance > fromTerritory->getNumOfArmies());
 
@@ -434,13 +433,12 @@ void Player::issueOrder() {
                 // addOrderToOrderList(advanceOrder);
                 // fromTerritory->setNumOfArmies(fromTerritory->getNumOfArmies() - numUnitsToAdvance);
 
-                cout << "Advance Order #" << orderNumber << " issued. " << numUnitsToAdvance << " units advanced from " << fromTerritory->getTerritoryName() << " to " << toTerritory->getTerritoryName() << "." << endl;
+                cout << "\nADVANCE ORDER #" << orderNumber << " ISSUED: " << numUnitsToAdvance << " units advanced from " << fromTerritory->getTerritoryName() << " to " << toTerritory->getTerritoryName() << "." << endl;
             }
         }
     }
 
-
-    //draw card
+    //*************************DRAW CARD*******************
 
     // Check if the player has any cards in their hand
     if (handOfCards == nullptr || handOfCards->hand.empty()) {
@@ -485,7 +483,7 @@ void Player::issueOrder() {
                 // Implement the Diplomacy card logic here
                 break;
             default:
-                cout << "Invalid card type. Please try again." << endl;
+                cout << "**Invalid card type. Please try again.**" << endl;
                 break;
         }
 

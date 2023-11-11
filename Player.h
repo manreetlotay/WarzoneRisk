@@ -9,6 +9,7 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 #include "Cards.h"
 #include "Orders.h"
 #include "Map.h"
+#include <iomanip>
 
 
 class Player {
