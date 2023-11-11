@@ -297,3 +297,13 @@ void Map::getADJTerritories(string territoryName)
     }
     cout << endl;
 }
+
+bool Map::isADJ(string name1, string name2)
+{   
+    Territory* t1 = findTerritoryByName(name1);
+    Territory* t2 = findTerritoryByName(name2);
+    auto it = find_if(t1->adjencyList.begin(), t1->adjencyList.end(), [&name2](Territory* cont) {return cont->getTerritoryName() == name2; });
+    return (it != t1->adjencyList.end()) ? true : false;
+}
+
+

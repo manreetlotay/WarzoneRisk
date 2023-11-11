@@ -15,7 +15,8 @@ void testLoadMaps()
     map.showTerritories();
     map.showContinents();
     map.getADJTerritories("Cuba");
-            
+    cout<<map.isADJ("Cuba", "Florida");
+
     Map map2;
     map2.mapLoader("Canada.map");
     map2.Validate();
