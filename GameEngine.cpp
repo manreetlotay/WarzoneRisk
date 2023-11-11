@@ -439,8 +439,8 @@ void GameEngine::startupPhase() {
 
         //Welcome the user to Warzone
         cout << "===================================================================================================================" << endl;
-        cout << "| WELCOME TO THE WORLD OF WARZONE, where strategy and wit reign supreme!" << endl;
-        cout << "| Get ready to conquer your way to victory on this interconnected battlefield, one move at a time!" << endl;
+        cout << "| WELCOME TO THE WORLD OF WARZONE, where strategy and wit reign supreme!                                           |" << endl;
+        cout << "| Get ready to conquer your way to victory on this interconnected battlefield, one move at a time!                 |" << endl;
         cout << "===================================================================================================================\n" << endl;
         
         //Let the user choose a map and validate it
@@ -635,15 +635,17 @@ void GameEngine::reinforcementPhase() {
 void GameEngine::issueOrdersPhase() {
 
     cout << "\nIT'S TIME TO ISSUE YOUR COMMANDS\n" << endl;
-    cout << "  O" << endl;
-    cout << " /|\\" << endl;
-    cout << " / \\" << endl;
-    cout << "/   \\" << endl;
-    cout << "\n";
 
     for (Player* player : allPlayers) {
+
+        cout << "  O" << endl;
+        cout << " /|\\" << endl;
+        cout << " / \\" << endl;
+        cout << "/   \\" << endl;
+        cout << "\n" << endl;;
         
-        cout << player->getPlayerID() << ", IT IS YOUR TURN.......................................\n" << endl;
+        cout << "___________________________________________________________________________________" << endl;
+        cout << player->getPlayerID() << ", IT IS YOUR TURN.....\n" << endl;
         player->issueOrder();
     }
 

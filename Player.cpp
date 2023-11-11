@@ -448,14 +448,14 @@ void Player::issueOrder() {
         return;
     }
 
-    cout << "HERE ARE THE CARDS IN YOUR HAND" << endl;
+    cout << "HERE ARE THE CARDS IN YOUR HAND:" << endl;
         for (int i = 0; i < handOfCards->hand.size(); i++) {
             cout << i + 1 << ". " << *handOfCards->hand[i] << endl;
         }
 
         int cardChoice;
         do {
-            cout << "CHOOSE THE CARD YOU WANT TO USE (1-" << handOfCards->hand.size() << "): ";
+            cout << "\nCHOOSE THE CARD YOU WANT TO USE (1-" << handOfCards->hand.size() << "): " << endl;;
             cin >> cardChoice;
             cin.ignore();
 
