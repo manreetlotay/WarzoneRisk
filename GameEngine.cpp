@@ -14,12 +14,26 @@ execorder
 win
 play
 */
+
+//Initialize variables
+        Map selectedMap;
+        vector<Player*> allPlayers;
+        int numPlayers;
+        vector<string> playerNames;
+        vector<string> mapNames = { "maps/Canada.map", "maps/Caribbean.map" };
+        string selectedMapName;
+
 GameEngine::GameEngine() {
 
     userInput = new string("");
     players = new int(0);
 
 }
+
+GameEngine::~GameEngine()
+{
+}
+
 void GameEngine::loadMap(string& uInput) {
     int errCounter = 0; //Counter for number of wrong command entries
     bool flag = true;
@@ -424,6 +438,269 @@ string GameEngine::getCommand() {
 //    
 //}
 
-GameEngine::~GameEngine()
-{
+void GameEngine::startupPhase() {
+
+        //Welcome the user to Warzone
+        cout << "===================================================================================================================" << endl;
+        cout << "| WELCOME TO THE WORLD OF WARZONE, where strategy and wit reign supreme!" << endl;
+        cout << "| Get ready to conquer your way to victory on this interconnected battlefield, one move at a time!" << endl;
+        cout << "===================================================================================================================\n" << endl;
+        
+        //Let the user choose a map and validate it
+        while (true) {
+            cout << "WARRIORS, THE TIME HAS COME TO MAKE A CRUCIAL DECISION. PLEASE SELECT A MAP.\n" << endl;
+            for (int i = 0; i < mapNames.size(); i++) {
+                cout << i + 1 << ". " << mapNames[i] << endl;
+            }
+
+            int choice;
+            cin >> choice;
+
+            if (choice >= 1 && choice <= mapNames.size()) {
+                selectedMap = Map();
+                selectedMapName = mapNames[choice - 1];
+                selectedMap.mapLoader(selectedMapName);
+                selectedMap.Validate();
+
+                if (selectedMap.checkContinentConnections() && selectedMap.checkTerritoryConnections()) {
+                    cout << "Map '" << selectedMapName << "' has been selected." << endl;
+                    break;
+                } else {
+                    cout << "\nAH, IT APPEARS THAT THE PATH YOU'VE CHOSEN IS NOT ONE WE CAN TRAVERSE. LET'S TRY ANOTHER ROUTE, SHALL WE? PLEASE SELECT A VALID MAP TO CONTINUE YOUR JOURNEY.\n" << endl;
+                }
+            } else {
+                cout << "\nAH, IT APPEARS THAT YOU'VE MADE THE WRONG CHOICE. PLEASE SELECT A VALID MAP TO CONTINUE YOUR JOURNEY.\n" << endl;
+            }
+        }
+
+        cout << "\nFANTASTIC CHOICE! YOUR MAP HAS BEEN SUCCESSFULLY LOADED AND IS NOW READY FOR YOU TO EMBARK ON YOUR CONQUEST.\n" << endl;
+        cout << "TAKE A MOMENT TO SURVEY THE TERRITORIES WHERE YOU'LL BE WAGING YOUR EPIC BATTLES.\n" << endl;
+
+        //Display Territories to players
+        selectedMap.showTerritories();
+        cout << "\n";
+        cout << "THE MAP YOU'VE LOADED CONSISTS OF A TOTAL OF " << selectedMap.getTerritoryList().size() << " TERRITORIES." << endl;
+        
+        // Prompt the user to add players to the game
+        while (true) {
+            cout << "\nIT IS NOW TIME TO CHOOSE YOUR ALLIES. YOU HAVE THE OPTION TO INVITE BETWEEN 2 AND 6 PLAYERS TO JOIN THE BATTLE. PLEASE SELECT A VALID NUMBER OF PLAYERS:\n";
+            cin >> numPlayers;
+
+            if (numPlayers >= 2 && numPlayers <= 6) {
+                break;
+            } else {
+                cout << "\nOOPS! IN WARZONE, WE'RE LIMITED TO 2 TO 6 PLAYERS. PLEASE CHOOSE A VALID NUMBER OF COMRADES TO RALLY.\n" << endl;
+            }
+        }
+
+        //Prompt user to enter names for each player
+        cout << "\nGREAT! NOW THAT YOU'VE RALLIED YOUR FORCES, IT'S TIME TO BESTOW UNIQUE TITLES UPON EACH WARRIOR IN YOUR ARMY. CHOOSE A NAME FOR EVERY PLAYER, AND LET THEIR LEGEND BEGIN!\n" << endl;
+        for (int i = 0; i < numPlayers; i++) {
+            string playerName;
+            cout << "PLEASE ENTER A NAME FOR PLAYER " << i + 1 << ": ";
+            cin >> playerName;
+            playerNames.push_back(playerName);
+        }
+
+        cout << "\nGREAT JOB! THOSE ARE SOME FANTASTIC NAMES FOR YOUR BATTLE-HARDENED COMRADES.\n" << endl;
+
+        //Store players in allPayers
+        for (int i = 0; i < numPlayers; i++) {
+            Player* newPlayer = new Player();
+            newPlayer->setPlayerID(playerNames[i]);
+            allPlayers.push_back(newPlayer);
+        }
+
+        cout << "\nWARRIORS, YOU HAVE ALL BEEN GRANTED YOUR FAIR SHARE OF TERRITORIES. SURVEY THE LANDS UNDER YOUR DOMINION AND THOSE THAT STAND AS THE REALMS OF YOUR FOES.\n" << endl;
+
+        // Assign territories to players 
+        vector<Territory*> territories = selectedMap.getTerritoryList();
+        random_shuffle(territories.begin(), territories.end());
+
+        //Set armies on territory to 0 initially
+        for (Territory* terr: territories) {
+            terr->setNumOfArmies(0);
+        }
+
+        int territoriesPerPlayer = territories.size() / numPlayers;
+
+        for (int i = 0; i < numPlayers; i++) {
+            vector<Territory*> playerTerritories(territories.begin() + i * territoriesPerPlayer, territories.begin() + (i + 1) * territoriesPerPlayer);
+
+            //Set the owner for each territory
+            for (Territory* territory : playerTerritories) {
+                territory->setTerritoryOwner(allPlayers[i]);
+            }
+
+            allPlayers[i]->setTerritoryList(playerTerritories);
+
+            cout << setw(25) << left << "Territory" << setw(25) << "Continent" << "Owner" << endl;
+            cout << "_____________________________________________________________________________" << endl;
+        
+            for (Territory* territory : playerTerritories) {
+                cout << setw(25) << left <<  territory->getTerritoryName();
+                cout << setw(25) << left << territory->getContinent()->getContinentName();
+                cout << setw(25) << left << territory->getTerritoryOwner()->getPlayerID() << endl;
+            }
+             
+            cout << "\n" << endl;
+        }
+
+
+        // Assign 50 army units to each player
+        for (Player* player : allPlayers) {
+            player->setReinforcementPool(50);
+        }
+
+      
+        //initialize deck with 30 cards
+        Deck gameDeck(30);
+
+        //Let each player draw two cards from the gameDeck
+        for (Player* player : allPlayers) {
+            Hand* handOfCards = player->getHandOfCards();
+            //if player doesn't have cards initially create and assign their handOfCards
+            if (!handOfCards) {
+                handOfCards = new Hand(); 
+                player->setHand(handOfCards); 
+            }
+            for (int i = 0; i < 2; ++i) {
+                gameDeck.Draw(handOfCards->hand);
+                
+            } 
+        }
+
+        // Randomize the order of players
+        random_shuffle(allPlayers.begin(), allPlayers.end());
+
+        cout << "ALL PLAYERS HAVE DRAWN TWO CARDS FROM THE DECK AND HAVE BEEN ASSIGNED 50 ARMY UNITS\n" << endl;
+        cout << "TAKE A LOOK AT YOUR BATTLE KIT!\n" << endl;
+
+        int playerOrder = 0;
+
+        //Display each player's initial status
+        for (Player* player: allPlayers) {
+            ++playerOrder; 
+            cout << "PLAYER ORDER: " << playerOrder << endl;
+            cout << "PLAYER: " << player->getPlayerID() << endl;
+            cout << "TERRITORIES OWNED: "; player->printTerritoryList(player->getTerritoryList());
+            cout << "\nREINFORCEMENT POOL: " << player->getReinforcementPool() << endl;
+            cout << "HAND OF CARDS: "; 
+                                        Hand* handOfCards = player->getHandOfCards();
+                                        for (int i = 0; i < handOfCards->hand.size(); i++) {
+                                        cout << *handOfCards->hand[i] << " ";
+                                        }
+            cout << "\n" << endl;
+        }
+
+        cout << "WARRIORS, GET READY TO PLUNGE INTO THE ACTION, FOR YOUR EPIC CONQUEST IS ABOUT TO BEGIN!\n" << endl;
+
+        cout << "    ______" << endl;
+        cout << " __/__|___\\__" << endl;
+        cout << "|  |  |  |  |" << endl;
+        cout << "|  |  |  |  |" << endl;
+        cout << "|__|__|__|__|" << endl;
+        cout << "|__|__|__|__|" << endl;
+        cout << "  | |    | |" << endl;
+        cout << "  | |    | |" << endl;
+        cout << "  |_|    |_|" << endl;
+        cout << "\n";
+    
 }
+
+void GameEngine::mainGameLoop() {
+    // void mainGameLoop() {
+
+//     // Variable to keep track of the current turn
+//     int turnCounter = 0;
+
+//     // Variable to limit the maximum number of game loops
+//     int maxGameLoops = 50;
+
+//     // Main game loop
+//     while (true) {
+//         // Check if a player has won by owning all territories
+//         Player* winningPlayer = checkForWin(allPlayers);
+//         if (winningPlayer != nullptr) {
+//             cout << "Congratulations, " << winningPlayer->getPlayerID() << " has won the game!" << endl;
+//             break;
+//         }
+
+//         // Check for players with no territories and remove them
+//         removePlayersWithNoTerritories(allPlayers);
+
+//         // Check if the maximum number of game loops is reached
+//         if (turnCounter >= maxGameLoops) {
+//             cout << "The game has ended in a draw." << endl;
+//             break;
+//         }
+
+//         // Get the current player for the current turn
+//         Player* currentPlayer = allPlayers[turnCounter % numPlayers];
+
+//         // Subphase 1: Reinforcement Phase
+//         reinforcementPhase(currentPlayer);
+
+//         // Subphase 2: Issue Orders Phase
+//         issueOrdersPhase(currentPlayer);
+
+//         // Subphase 3: Execute Orders Phase
+//         executeOrdersPhase(currentPlayer);
+
+//         // Increment the turn counter
+//         turnCounter++;
+//     }
+
+// }
+    
+
+   
+}
+
+void GameEngine::reinforcementPhase() {
+
+            cout << "ADDITIONAL ARMY UNITS ARE ON THE WAY, ENHANCING YOUR FORCES FOR THE BATTLES AHEAD. GET READY!" << endl;
+
+           for (Player* player : allPlayers) {
+                int newReinforcements = 0;
+
+                // Calculate newReinforcements based on the number of territories owned by the player; minimum value is 3
+                int territoriesOwned = player->getTerritoryList().size();
+                newReinforcements += max(3, territoriesOwned / 3);
+
+                // Check if the player owns any continents and add the continent control bonus
+                vector<Continent*> controlledContinents = selectedMap.continentsOwnedByPlayer(player);
+                for (Continent* continent : controlledContinents) {
+                    newReinforcements += continent->getContinentBonus();
+                }
+
+                // Update the player's reinforcement pool using the addReinforcements method
+                player->addReinforcements(newReinforcements);
+
+                //cout << player->getPlayerID() << ", this is your reinforcementPool" << player->getReinforcementPool() << endl;
+            }
+    
+}
+
+
+void GameEngine::issueOrdersPhase() {
+
+    cout << "WARRIORS, IT'S TIME TO ISSUE YOUR COMMANDS, ONE BY ONE\n" << endl;
+    cout << "  O" << endl;
+    cout << " /|\\" << endl;
+    cout << " / \\" << endl;
+    cout << "/   \\" << endl;
+    cout << "\n";
+
+    for (Player* player : allPlayers) {
+        
+        cout << player->getPlayerID() << ", IT IS YOUR TURN.......................................\n" << endl;
+        player->issueOrder();
+    }
+
+}
+
+void GameEngine::executeOrdersPhase() {
+    
+}
+

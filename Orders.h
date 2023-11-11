@@ -1,146 +1,149 @@
 #pragma once
-#ifndef ORDER_H
-#define ORDER_H
+#ifndef ORDERS_H
+#define ORDERS_H
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
+
+//#include "Map.h"
+class Territory;
+class Player;
+
 using namespace std;
 
-class Order
-{
-public :
+class Order {
 
-    Order();
+    public:
+        Order();
+        ~Order();
 
-    // Destrcutor
-    ~Order();
+        //copy constructor
+        Order(const Order &O);
 
-    //copy constructor
-    Order(const Order& O);
+        //assignment construtor
+        Order &operator=(const Order &O);
 
-    //assignment construtor
-    Order& operator = (const Order &O);
+        //Check if Order is valid
+        void validate();
 
-    //Check if Order is valid
-    void validate();
-    //Execute Order
-    void execute();
+        //Execute Order
+        void execute();
 
-    //set type of the subclass
-    void setTypeID(int num);
+        //set type of the subclass
+        void setTypeID(int num);
 
-    string getType();
+        string getType();
 
-    // Stream instertion operator
-    friend std :: ostream& operator<<(std::ostream& output, const Order& order);
+        // Stream instertion operator
+        friend std ::ostream &operator<<(std::ostream &output, const Order &order);
 
-private :
-    bool valid;
-    vector<string> vecType = { "deploy", "advance", "bomb", "blockade", "airlift", "negotiate" };
-    int typeID;
-    std:: string effect = "effect printed from Order Object";
+    private:
+        bool valid;
+        vector<string> vecType = {"deploy", "advance", "bomb", "blockade", "airlift", "negotiate"};
+        int typeID;
+        std::string effect = "effect printed from Order Object";
 };
 
-class Deploy : public Order
-{
+class Deploy : public Order {
 
-public:
-    Deploy();
-    ~Deploy();
-    string* getType();
-    friend std :: ostream& operator<<(std::ostream& output, const Deploy &deploy);
-private:
-    bool valid;
-    string type1 = { "deploy" };
-    std:: string effect = "effect printed from Deploy Object";
+    public:
+        Deploy();
+        Deploy(Player *orderOwner, int armyUnits, Territory *territory); // Manreet
+        ~Deploy();
+        string *getType();
+        friend std ::ostream &operator<<(std::ostream &output, const Deploy &deploy);
+
+    private:
+        bool valid;
+        string type1 = {"deploy"};
+        std::string effect = "effect printed from Deploy Object";
+        // Manreet
+        Player *orderOwner;
+        int armyUnits;
+        Territory *territory;
 };
 
 class Advance : public Order {
-public:
-    Advance();
-    ~Advance();
-    friend std :: ostream& operator<<(std::ostream& output, const Advance &advance);
+    public:
+        Advance();
+        ~Advance();
+        friend std ::ostream &operator<<(std::ostream &output, const Advance &advance);
 
-private:
-    bool valid;
-    std:: string effect = "effect printed from Advnace Object";
+    private:
+        bool valid;
+        std::string effect = "effect printed from Advnace Object";
 };
 
-class Bomb : public Order
-{
-public:
-    Bomb();
-    ~Bomb();
-    bool valid;
-private:
-    std:: string effect = "effect printed from Bomb Object";
+class Bomb : public Order {
+    public:
+        Bomb();
+        ~Bomb();
+        bool valid;
 
+    private:
+        std::string effect = "effect printed from Bomb Object";
 };
 
-class Blockade : public Order
-{
-public:
-    Blockade();
-    ~Blockade();
-    friend std :: ostream& operator<<(std::ostream& output, const Blockade &blockade);
-private:
-    bool valid;
-    std:: string effect = "effect printed from Blockade Object";
+class Blockade : public Order {
+    public:
+        Blockade();
+        ~Blockade();
+        friend std ::ostream &operator<<(std::ostream &output, const Blockade &blockade);
+
+    private:
+        bool valid;
+        std::string effect = "effect printed from Blockade Object";
 };
 
-class Airlift : public Order
-{
-public:
-    Airlift();
-    ~Airlift();
-    friend std :: ostream& operator<<(std::ostream& output, const Airlift &airlift);
-private:
-    bool valid;
-    std:: string effect = "effect printed from Airlift Object";
+class Airlift : public Order {
+        public:
+        Airlift();
+        ~Airlift();
+        friend std ::ostream &operator<<(std::ostream &output, const Airlift &airlift);
+
+    private:
+        bool valid;
+        std::string effect = "effect printed from Airlift Object";
 };
 
-class Negotiate : public Order
-{
-public:
-    Negotiate();
-    ~Negotiate();
-    friend std :: ostream& operator<<(std::ostream& output, const Negotiate &negotiate);
+class Negotiate : public Order {
+    public:
+        Negotiate();
+        ~Negotiate();
+        friend std ::ostream &operator<<(std::ostream &output, const Negotiate &negotiate);
 
-private:
-    bool valid;
-    std:: string effect = "effect printed from Negotiate Object";
+    private:
+        bool valid;
+        std::string effect = "effect printed from Negotiate Object";
 };
 
-class OrderList
-{
-public:
+class OrderList {
+    public:
+        OrderList();
 
-    OrderList();
+        OrderList(const OrderList &exsistingOrderList);
 
-    OrderList(const OrderList& exsistingOrderList);
+        ~OrderList();
 
-    ~OrderList();
+        // Sets the order of the list
+        void set_order_list(Order *an_order);
+        vector<Order *> *get_order_list();
+        // Remove order from list
+        void remove(Order *oneOrder);
+        // Move position
+        void move(int position, int newPosition);
 
-    // Sets the order of the list
-    void set_order_list(Order* an_order);
-    vector<Order*>* get_order_list();
-    //Remove order from list
-    void remove(Order* oneOrder);
-    //Move position
-    void move(int position, int newPosition);
+        OrderList &operator=(const OrderList &orderList);
 
-    OrderList& operator=(const OrderList& orderList);
+        friend std ::ostream &operator<<(std::ostream &output, const OrderList &orderlist);
 
-    friend std :: ostream& operator<<(std::ostream& output, const OrderList &orderlist);
-
-private:
-    std::vector<Order*> vec_order_list; //store the orders
-    std:: string effect = "effect printed from OrderList Object";
+    private:
+        std::vector<Order *> vec_order_list; // store the orders
+        std::string effect = "effect printed from OrderList Object";
 };
 
-
-//free function 
+// free function
 void testOrdersList();
 
 #endif

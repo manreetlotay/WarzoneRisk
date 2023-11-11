@@ -1,15 +1,15 @@
 #include <ostream>
-#include "Player.h"
+//#include "Player.h"
 #include "GameEngine.h"
 
 using namespace std;
 
 int main() {
 
-    testPlayers();
+  // testPlayers();
    // testCards();
-    // testLoadMaps();
+    //dtestLoadMaps();
     //testOrdersList();
-    //testGameStates();
+    testGameStates();
     
 }

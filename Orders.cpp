@@ -120,6 +120,8 @@ Deploy::Deploy()
     setTypeID(0);
 }
 
+Deploy::Deploy(Player* orderOwner, int armyUnits, Territory* territory) : Order(), orderOwner(orderOwner), armyUnits(armyUnits), territory(territory) {}
+
 Deploy::~Deploy()
 {
 }

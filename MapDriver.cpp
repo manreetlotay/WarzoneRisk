@@ -3,96 +3,36 @@
 #include <fstream>
 #include <string.h>
 #include <sstream>
+//#include <algorithm>
 
 using namespace std;
 
 void testLoadMaps()
 {
-    cout<<"Hello World :)";
-
-    ifstream file("C:\\Users\\Shangirna\\source\\repos\\Project3\\x64\\Debug\\Caribbean.map");
-
-    if(!file.is_open()){
-        cerr << "Failed to open file :("<< endl;
-    }
-
-    string line;
     Map map;
-    while (getline(file, line)){
-        if (line == "[Continents]"){
-            getline(file,line);
-            while(line != ""){
-                if (line != ""){ 
-                size_t delimPos = line.find("=");
-                string name = line.substr(0,delimPos);
-                int bonus = stoi(line.substr(delimPos+1,line.length()));
-                Continent* c = new Continent(name, bonus);
-                map.continentList.push_back(c);
-                getline(file,line);
-                }
-            }
-            
-        }
-        if (line == "[Territories]"){
-            getline(file,line);
-            
-            string name;
-            while (!file.eof()) 
-            {
-                bool flag = false;
-                while(line == ""){
-                    getline(file,line); 
-                    flag= file.eof();
-                    if(flag == true){
-                        break;
-                    }                    
-                }
-                if (flag == false){
-                    stringstream ss(line);
-                    vector<string> tokens;
-                    string token;
-                    while (getline(ss,token,','))
-                    {
-                        tokens.push_back(token); 
-                    }
+    map.mapLoader("maps/Caribbean.map");
+    map.Validate();
+    map.showTerritories();
+    map.showContinents();
+    map.getADJTerritories("Jamaica");
+    
+    Map map2;
+    map2.mapLoader("maps/Canada.map");
+    map2.Validate();
 
-                    string nameTerritory = tokens[0];
-                    name = tokens[3];
-                    Continent* c;
-                    Territory* t;
-                    c= map.findContinentByName(name);
+    
 
-                    if (map.findTerritoryByName(nameTerritory)==nullptr)
-                    { 
-                        t = new Territory(tokens[0],c);
-                        map.territoryList.push_back(t);
-                    } else {
-                        t = map.findTerritoryByName(nameTerritory);
-                        t->setContinent(c);
-                    }
+    Territory* t1 = map.findTerritoryByName("Venezuela");
+    cout << "armies of venezuela: " << t1->getNumOfArmies() << endl;
+    cout << "name of t1" << t1->getTerritoryName() << endl;
+    cout << "owner of t1" << t1->getTerritoryOwner() << endl;
 
-                    // Check if adjacent territory exist
-                    for (int i=4;i< tokens.size();i++){
-                        name = tokens[i];
-                        auto it = find_if(map.territoryList.begin(),map.territoryList.end(),[&name](Territory* cont){return cont->getTerritoryName() == name;});
-                        if (it == map.territoryList.end()){
-                            Territory* newTerritory = new Territory(name);
-                            map.territoryList.push_back(newTerritory);
-                            t->adjencyList.push_back(newTerritory);
-                        }else{
-                            t->adjencyList.push_back(*it);
-                        }
-                    }
-                    getline(file,line);
-                }
-            }
-        }
-    }
-    bool a = map.Validate();
-    if (a == true) {
-        cout << "Map created and validated";
-    }
-    else {
-        cout << "Map not valid";
-    }
+    Territory* t2 = map.findTerritoryByName("Cuba");
+    cout << "armies of cuba: " << t2->getNumOfArmies() << endl;
+    
+
+    Continent* c1 = map.findContinentByName("East");
+    cout << "continent bonus" << c1->getContinentBonus() << endl;
+   
+
 }

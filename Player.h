@@ -10,6 +10,7 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 #include "Orders.h"
 #include "Map.h"
 
+
 class Player {
 
     private:  
@@ -35,7 +36,7 @@ class Player {
         friend std::ostream &operator << (std::ostream &output, Player &player);
 
         // required methods of a Player
-        void issueOrder(Order* order);
+        void issueOrder();
         vector<Territory*> toDefend();
         vector<Territory*> toAttack();
 
@@ -54,7 +55,12 @@ class Player {
 
         //Other
         void printTerritoryList(vector<Territory*> terrListToPrint);
+        void addReinforcements(int armyUnits);
+        void removeReinforcements(int armyUnits);
+        void addOrderToOrderList(Order* order);
 };
 
 //free function declaration
 void testPlayers();
+
+

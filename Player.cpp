@@ -5,6 +5,8 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 
 #include "Player.h"
 #include <iostream>
+#include <algorithm> 
+#include <set>
 
 // default constructor
 Player::Player() : handOfCards(nullptr), orderList(nullptr), territoryList(vector<Territory*>()), playerID("default"){}
@@ -203,30 +205,309 @@ void Player::setReinforcementPool(int newReinforcementPool) {
     reinforcementPool = newReinforcementPool;
 }
 
+void Player::addReinforcements(int armyUnits) {
+    this->reinforcementPool += armyUnits;
+}
+
+void Player::removeReinforcements(int armyUnits) {
+    this->reinforcementPool -= armyUnits;
+}
+
+void Player::addOrderToOrderList(Order* order) {
+    orderList->set_order_list(order);
+}
+
 //create Order object and add it to player's list of orders
-void Player::issueOrder(Order* order) {
-    if (orderList != nullptr && order != nullptr) {
-        orderList->set_order_list(order);
+void Player::issueOrder() {
+
+    vector<Territory*> toDefend = this->toDefend();
+    vector<Territory*> toAttack = this->toAttack();
+
+    // Ensure the player still has territories to defend
+    if (toDefend.empty() || this->reinforcementPool <= 0) {
+        return;
     }
+
+    bool deployedAll = false;
+
+    // Display territories to defend and the number of armies on each territory
+    cout << playerID << ", here are the territories you need to defend and the current number of armies on each:\n";
+    for (int i = 0; i < toDefend.size(); i++) {
+        cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << " (Number of Armies: " << toDefend[i]->getNumOfArmies() << ")\n";
+    }
+    cout << endl;
+
+    while (!deployedAll) {
+        cout << "You currently have " << this->reinforcementPool << " army units in your reinforcement pool.\n" << endl;
+        deployedAll = true; // Assume they deploy all available armies
+
+        // Loop through the territories to defend
+        for (int i = 0; i < toDefend.size(); i++) {
+            Territory* targetTerritory = toDefend[i];
+
+            // Prompt the user to enter the number of army units to deploy
+            int numDeployed;
+            do {
+                cout << "Select the number of troops you wish to deploy for " << targetTerritory->getTerritoryName() << " (Number of army units available: " << this->reinforcementPool << "): ";
+                cin >> numDeployed;
+
+                if (numDeployed < 0 || numDeployed > this->reinforcementPool) {
+                    cout << "Invalid number of army units. Please try again.\n" << endl;
+                }
+            } while (numDeployed < 0 || numDeployed > this->reinforcementPool);
+
+            // // Create a Deploy order
+            // Deploy* deployOrder = new Deploy(this, numDeployed, targetTerritory);
+            // // Add the order to the player's order list
+            // addOrderToOrderList(deployOrder);
+
+            // Update the number of armies in the target territory
+            targetTerritory->setNumOfArmies(targetTerritory->getNumOfArmies() + numDeployed);
+
+            // Remove deployed army units from the reinforcement pool
+            this->reinforcementPool -= numDeployed;
+
+            // Check if there are no more armies left to deploy
+            if (this->reinforcementPool <= 0) {
+                deployedAll = true; // All armies have been deployed
+                break;
+            } else {
+                deployedAll = false; // Some armies remain in the reinforcement pool
+            }
+        }
+
+        if (deployedAll) {
+            cout << "You've deployed all your available armies. Ending deployment phase.\n" << endl;
+        } else {
+            cout << "You still have army units in your reinforcement pool. You need to deploy your armies to defend your territories. Please have a look at your territories to defend again and deploy your armies.\n" << endl;
+        }
+    }
+
+
+
+
+//advance order
+
+
+
+
+
+
+ char ynAdvanceOrder;
+    cout << playerID << " Do you wish to issue advance orders (y/n)? ";
+    cin >> ynAdvanceOrder;
+    cin.ignore();
+
+    if (ynAdvanceOrder == 'y') {
+        int numAdvanceOrders;
+        do {
+            cout << "How many advance orders would you like to issue (1-5)? ";
+            cin >> numAdvanceOrders;
+            cin.ignore(); // Consume the newline character
+
+            if (numAdvanceOrders < 1 || numAdvanceOrders > 5) {
+                cout << "Invalid number of advance orders. Must be between 1 and 5." << endl;
+            }
+        } while (numAdvanceOrders < 1 || numAdvanceOrders > 5);
+
+        for (int orderNumber = 1; orderNumber <= numAdvanceOrders; orderNumber++) {
+            cout << "Advance Order #" << orderNumber << ":\n";
+
+            int choice;
+            do {
+                cout << "Choose the type of advance order:\n";
+                cout << "1. Advance units to your territory\n";
+                cout << "2. Advance units to an enemy territory\n";
+                cin >> choice;
+                cin.ignore(); // Consume the newline character
+            } while (choice != 1 && choice != 2);
+
+            if (choice == 1) { // Advance units to your territory
+                // Display the territories to defend
+                cout << "Here is a list of your territories:\n";
+                for (int i = 0; i < toDefend.size(); i++) {
+                    cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << "Armies: " << toDefend[i]->getNumOfArmies() << "\n";
+                }
+                int fromChoice;
+                do {
+                    cout << "Choose the source territory (1-" << toDefend.size() << "): ";
+                    cin >> fromChoice;
+                    cin.ignore(); // Consume the newline character
+
+                    if (fromChoice < 1 || fromChoice > toDefend.size()) {
+                        cout << "Invalid territory choice. Please try again." << endl;
+                    }
+                } while (fromChoice < 1 || fromChoice > toDefend.size() || toDefend[fromChoice-1]->getNumOfArmies() == 0);
+
+                // Select the 'from' territory
+                Territory* fromTerritory = toDefend[fromChoice - 1];
+
+
+                int toChoice;
+                do {
+                    cout << "Choose the target territory (1-" << toDefend.size() << "): ";
+                    cin >> toChoice;
+                    cin.ignore(); // Consume the newline character
+
+                    if (toChoice < 1 || toChoice > toDefend.size()) {
+                        cout << "Invalid territory choice. Please try again." << endl;
+                    }
+                } while (toChoice < 1 || toChoice > toDefend.size());
+
+                // Select the 'to' territory
+                Territory* toTerritory = toDefend[toChoice - 1];
+
+                int numUnitsToAdvance;
+                do {
+                    cout << "Enter the number of units to advance (1-" << fromTerritory->getNumOfArmies() << "): ";
+                    cin >> numUnitsToAdvance;
+                    cin.ignore(); // Consume the newline character
+
+                    if (numUnitsToAdvance < 1 || numUnitsToAdvance > fromTerritory->getNumOfArmies()) {
+                        cout << "Invalid number of units to advance. Please try again." << endl;
+                    }
+                } while (numUnitsToAdvance < 1 || numUnitsToAdvance > fromTerritory->getNumOfArmies());
+
+                // Advance* advanceOrder = new Advance(this, numUnitsToAdvance, fromTerritory, toTerritory);
+                // addOrderToOrderList(advanceOrder);
+                // fromTerritory->setNumOfArmies(fromTerritory->getNumOfArmies() - numUnitsToAdvance);
+
+                cout << "Advance Order #" << orderNumber << " issued. " << numUnitsToAdvance << " units advanced from " << fromTerritory->getTerritoryName() << " to " << toTerritory->getTerritoryName() << "." << endl;
+            
+            
+            } else { // Advance units to an enemy territory
+
+                // Display the territories to defend
+                cout << "Here is a list of your territories:\n";
+                for (int i = 0; i < toDefend.size(); i++) {
+                    cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << "Armies: " << toDefend[i]->getNumOfArmies() << "\n";
+                }
+
+
+                int fromChoice;
+                int enemyChoice;
+
+                do {
+                    cout << "Choose the source territory (1-" << toDefend.size() << "): ";
+                    cin >> fromChoice;
+                    cin.ignore(); // Consume the newline character
+
+                    if (fromChoice < 1 || fromChoice > toDefend.size()) {
+                        cout << "Invalid territory choice. Please try again." << endl;
+                    }
+                } while (fromChoice < 1 || fromChoice > toDefend.size() || toDefend[fromChoice-1]->getNumOfArmies() == 0);
+
+                // Select the source 'from' territory
+                Territory* fromTerritory = toDefend[fromChoice - 1];
+
+                cout << "Here is a list of enemy territories to attack:\n";
+                for (int i = 0; i < toAttack.size(); i++) {
+                    cout << i + 1 << ". Territory Name: " << toAttack[i]->getTerritoryName() << " ( Owner: " << toAttack[i]->getTerritoryOwner()->getPlayerID() << " )\n";
+                }
+
+                do {
+                    cout << "Choose the enemy territory to attack (1-" << toAttack.size() << "): ";
+                    cin >> enemyChoice;
+                    cin.ignore(); // Consume the newline character
+
+                    if (enemyChoice < 1 || enemyChoice > toAttack.size()) {
+                        cout << "Invalid territory choice. Please try again." << endl;
+                    }
+                } while (enemyChoice < 1 || enemyChoice > toAttack.size());
+
+                // Select the target enemy territory
+                Territory* toTerritory = toAttack[enemyChoice - 1];
+
+                int numUnitsToAdvance;
+
+                do {
+                    cout << "Enter the number of units to advance (1-" << fromTerritory->getNumOfArmies() << "): ";
+                    cin >> numUnitsToAdvance;
+                    cin.ignore(); // Consume the newline character
+
+                    if (numUnitsToAdvance < 1 || numUnitsToAdvance > fromTerritory->getNumOfArmies()) {
+                        cout << "Invalid number of units to advance. Please try again." << endl;
+                    }
+                } while (numUnitsToAdvance < 1 || numUnitsToAdvance > fromTerritory->getNumOfArmies());
+
+                // Advance* advanceOrder = new Advance(this, numUnitsToAdvance, fromTerritory, toTerritory);
+                // addOrderToOrderList(advanceOrder);
+                // fromTerritory->setNumOfArmies(fromTerritory->getNumOfArmies() - numUnitsToAdvance);
+
+                cout << "Advance Order #" << orderNumber << " issued. " << numUnitsToAdvance << " units advanced from " << fromTerritory->getTerritoryName() << " to " << toTerritory->getTerritoryName() << "." << endl;
+            }
+        }
+    }
+
+
+    //draw card
+
+    // Check if the player has any cards in their hand
+    if (handOfCards == nullptr || handOfCards->hand.empty()) {
+        cout << playerID << ", you don't have any cards in your hand. Ending your order phase." << endl;
+        return;
+    }
+
+    cout << "Here are the cards in your hand:" << endl;
+        for (int i = 0; i < handOfCards->hand.size(); i++) {
+            cout << i + 1 << ". " << *handOfCards->hand[i] << endl;
+        }
+
+        int cardChoice;
+        do {
+            cout << "Choose the card you want to use (1-" << handOfCards->hand.size() << "): ";
+            cin >> cardChoice;
+            cin.ignore();
+
+            if (cardChoice < 1 || cardChoice > handOfCards->hand.size()) {
+                cout << "Invalid card choice. Please try again." << endl;
+            }
+        } while (cardChoice < 1 || cardChoice > handOfCards->hand.size());
+
+        Card* selectedCard = handOfCards->hand[cardChoice - 1];
+
+        //Play the Card
+        // Use the selected card based on its type
+        switch (selectedCard->getValue()) {
+            case 'B':
+                // Implement the Bomb card logic here
+                break;
+            case 'R':
+                // Implement the Reinforcement card logic here  
+                break;
+            case 'L':
+                // Implement the Blockade card logic here
+                break;
+            case 'A':
+                // Implement the Airlift card logic here
+                break;
+            case 'D':
+                // Implement the Diplomacy card logic here
+                break;
+            default:
+                cout << "Invalid card type. Please try again." << endl;
+                break;
+        }
+
+
+         // Remove the used card from the player's hand
+        handOfCards->hand.erase(handOfCards->hand.begin() + cardChoice - 1);
+    
 }
 
 //Return List of territories to be defended by Player
 vector<Territory*> Player::toDefend() {
 
-    vector<Territory*> terrToDefend;
+    //initialize terrToDefend with the Player's territoryList
+    vector<Territory*> terrToDefend(territoryList.begin(), territoryList.end());
 
-    // Check if the Player's territoryList is empty
-    if (!territoryList.empty()) {
-
-        //FOR NOW: Iterate through territoryList and if Territory has armies < 2, it need to be defended
-        for (Territory* territory : territoryList) {
-            if (territory->getNumOfArmies() < 2) {
-                terrToDefend.push_back(territory);
-            }
-        }
-    }
+    //sort terrToDefend vector in ascending order of NumOfArmies on Territory
+    std::sort(terrToDefend.begin(), terrToDefend.end(), [](Territory* a, Territory* b) {
+        return a->getNumOfArmies() < b->getNumOfArmies();
+    });
 
     return terrToDefend;
+
 }
 
 //Return List of territories to be attacked by Player
@@ -234,25 +515,33 @@ vector<Territory*> Player::toAttack() {
 
     vector<Territory*> terrToAttack;
 
-    // Check if the Player's territoryList is empty
-    if (!territoryList.empty()) {
+    //Loop through the Player's territoryList
+    for (Territory* territory : territoryList) {
 
-        //FOR NOW: Iterate through territoryList and if Territory has armies >= 2, it need to be attacked
-        for (Territory* territory : territoryList) {
-            if (territory->getNumOfArmies() >= 2) {
-                terrToAttack.push_back(territory);
+        //Get adjacent territories of the current territory
+        vector<Territory*> adjacentTerritories = territory->adjencyList;
+
+        //Loop through the adjacent territories
+        for (Territory* adjacentTerritory : adjacentTerritories) {
+
+            //Check if the adjacent territory is not owned by the player
+                if (adjacentTerritory->getTerritoryOwner() != this) {
+                    //Prevent duplicates in terrToAttack
+                    if (find(terrToAttack.begin(), terrToAttack.end(), adjacentTerritory) == terrToAttack.end()) {
+                        terrToAttack.push_back(adjacentTerritory);
+                    }
+                }
             }
         }
-    }
 
-    return terrToAttack;
+	return terrToAttack;
 }
 
 //Print Each Territory object's name and other info inside territoryList
 void Player::printTerritoryList(vector<Territory*> terrListToPrint) {
     //Iterate through territoryList and print name of each Territory
      for (Territory* territory : terrListToPrint) {
-        std::cout << territory->getTerritoryName() << std::endl;
+        std::cout << territory->getTerritoryName() << ", ";
     }
 }
 
