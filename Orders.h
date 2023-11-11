@@ -1,149 +1,170 @@
+//
+// Created by hengy on 11/10/2023.
+//
 #pragma once
-#ifndef ORDERS_H
-#define ORDERS_H
 #include <iostream>
-#include <fstream>
 #include <vector>
-#include <string>
-
-//#include "Map.h"
-class Territory;
-class Player;
-
 using namespace std;
+class Player;
+class Territory;
 
-class Order {
+class Order{
+public:
+    virtual ~Order();
+    friend ostream &operator<<(ostream &output, const Order & order);
+    virtual Order* clone() const = 0;
+    void execute();
+    virtual bool validate() const = 0;
+    int getPriority() const;
+    string getType();
 
-    public:
-        Order();
-        ~Order();
+protected:
+    Order();
+    Order(Player* issuePlayer, int priority);
+    Order(const Order &order);
+    const Order &operator=(const Order &order);
+    virtual void execute_() = 0;
+    virtual ostream &print_(ostream &output) const = 0;
+    Player* issuePlayer;
 
-        //copy constructor
-        Order(const Order &O);
-
-        //assignment construtor
-        Order &operator=(const Order &O);
-
-        //Check if Order is valid
-        void validate();
-
-        //Execute Order
-        void execute();
-
-        //set type of the subclass
-        void setTypeID(int num);
-
-        string getType();
-
-        // Stream instertion operator
-        friend std ::ostream &operator<<(std::ostream &output, const Order &order);
-
-    private:
-        bool valid;
-        vector<string> vecType = {"deploy", "advance", "bomb", "blockade", "airlift", "negotiate"};
-        int typeID;
-        std::string effect = "effect printed from Order Object";
+private:
+    int priority;
+    vector<string> vecType = { "deploy", "advance", "bomb", "blockade", "airlift", "negotiate" };
+    int typeID;
+    void setTypeID(int num);
 };
 
-class Deploy : public Order {
+class OrderList
+{
+public:
 
-    public:
-        Deploy();
-        Deploy(Player *orderOwner, int armyUnits, Territory *territory); // Manreet
-        ~Deploy();
-        string *getType();
-        friend std ::ostream &operator<<(std::ostream &output, const Deploy &deploy);
+    OrderList();
+    OrderList(const OrderList& list);
+    ~OrderList();
+    void addOrder(Order* order);
+    void set_order_list(Order* an_order);
+    vector<Order*>* get_order_list();
+    void remove(Order* oneOrder);
+    void move(int position, int newPosition);
+    OrderList& operator=(const OrderList& orderList);
+    friend std :: ostream& operator<<(std::ostream& output, const OrderList &list);
 
-    private:
-        bool valid;
-        string type1 = {"deploy"};
-        std::string effect = "effect printed from Deploy Object";
-        // Manreet
-        Player *orderOwner;
-        int armyUnits;
-        Territory *territory;
+private:
+    std::vector<Order*> vec_order_list; //store the orders
+    std:: string effect = "effect printed from OrderList Object";
 };
 
-class Advance : public Order {
-    public:
-        Advance();
-        ~Advance();
-        friend std ::ostream &operator<<(std::ostream &output, const Advance &advance);
+class Deploy : public Order{
+public:
+    Deploy();
+    Deploy(Player* issuer, int numberOfArmy, Territory* target);
+    Deploy(const Deploy &order);
+    const Deploy &operator=(const Deploy &order);
+    Order* clone() const;
+    void addArmies(int additional);
+    bool validate() const;
 
-    private:
-        bool valid;
-        std::string effect = "effect printed from Advnace Object";
+
+protected:
+    void execute_();
+    ostream &print_(ostream &output) const;
+
+private:
+    int numberOfArmy;
+    Territory* target;
 };
 
-class Bomb : public Order {
-    public:
-        Bomb();
-        ~Bomb();
-        bool valid;
+class Advance : public Order{
+    Advance();
+    Advance(Player* issuer, int numberOfArmy, Territory* source, Territory* target);
+    Advance(const Advance &order);
+    const Advance &operator=(const Advance &order);
+    Order* clone() const;
+    bool validate() const;
 
-    private:
-        std::string effect = "effect printed from Bomb Object";
+protected:
+    void execute_();
+    ostream &print_(ostream &output) const;
+
+private:
+    int numberOfArmy;
+    Territory* source;
+    Territory* target;
 };
 
-class Blockade : public Order {
-    public:
-        Blockade();
-        ~Blockade();
-        friend std ::ostream &operator<<(std::ostream &output, const Blockade &blockade);
+class Bomb : public Order
+{
+public:
+    Bomb();
+    Bomb(Player* issuer, Territory* target);
+    Bomb(const Bomb &order);
+    const Bomb &operator=(const Bomb &order);
+    Order* clone() const;
+    bool validate() const;
 
-    private:
-        bool valid;
-        std::string effect = "effect printed from Blockade Object";
+protected:
+    void execute_();
+    ostream &print_(ostream &output) const;
+
+private:
+    Territory* target;
 };
 
-class Airlift : public Order {
-        public:
-        Airlift();
-        ~Airlift();
-        friend std ::ostream &operator<<(std::ostream &output, const Airlift &airlift);
+class Blockade : public Order
+{
+public:
+    Blockade();
+    Blockade(Player* issuer, Territory* territory);
+    Blockade(const Blockade &order);
+    const Blockade &operator=(const Blockade &order);
+    Order* clone() const;
+    bool validate() const;
 
-    private:
-        bool valid;
-        std::string effect = "effect printed from Airlift Object";
+protected:
+    void execute_();
+    ostream &print_(ostream &output) const;
+
+private:
+    Territory* territory;
 };
 
-class Negotiate : public Order {
-    public:
-        Negotiate();
-        ~Negotiate();
-        friend std ::ostream &operator<<(std::ostream &output, const Negotiate &negotiate);
+class Airlift: public Order
+{
+public:
+    Airlift();
+    Airlift(Player* issuer, int numberOfArmies, Territory* source, Territory* destination);
+    Airlift(const Airlift &order);
+    const Airlift &operator=(const Airlift &order);
+    Order* clone() const;
+    bool validate() const;
 
-    private:
-        bool valid;
-        std::string effect = "effect printed from Negotiate Object";
+protected:
+    void execute_();
+    ostream &print_(ostream &output) const;
+
+private:
+    int numberOfArmy;
+    Territory* source;
+    Territory* target;
 };
 
-class OrderList {
-    public:
-        OrderList();
+class Negotiate : public Order
+{
+public:
+    Negotiate();
+    Negotiate(Player* issuer, Player* target);
+    Negotiate(const Negotiate &order);
+    const Negotiate &operator=(const Negotiate &order);
+    Order* clone() const;
+    bool validate() const;
 
-        OrderList(const OrderList &exsistingOrderList);
+protected:
+    void execute_();
+    ostream &print_(ostream &output) const;
 
-        ~OrderList();
-
-        // Sets the order of the list
-        void set_order_list(Order *an_order);
-        vector<Order *> *get_order_list();
-        // Remove order from list
-        void remove(Order *oneOrder);
-        // Move position
-        void move(int position, int newPosition);
-
-        OrderList &operator=(const OrderList &orderList);
-
-        friend std ::ostream &operator<<(std::ostream &output, const OrderList &orderlist);
-
-    private:
-        std::vector<Order *> vec_order_list; // store the orders
-        std::string effect = "effect printed from OrderList Object";
+private:
+    Player* targetPlayer;
 };
 
-// free function
-void testOrdersList();
 
-#endif
+#endif //TEST_ORDERTEST_H

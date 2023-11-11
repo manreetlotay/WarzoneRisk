@@ -1,32 +1,58 @@
+//
+// Created by hengy on 11/10/2023.
+//
+
 #include "Orders.h"
+#include "Map.h"
+#include "Player.h"
+#include <algorithm>
+#include <iterator>
+#include <math.h>
 
-
-Order::Order()
+namespace
 {
-    std::cout<<"Order default constructor called"<< endl;
-}
-
-Order::~Order()
-{
-
-}
-Order::Order(const Order& O)
-{
-    this->effect = O.effect;
-    this->vecType = *new vector<string>(O.vecType);
-    this->typeID = *new int(O.typeID);
-}
-void Order::validate()
-{
-    cout << "Validating Order" << endl;
-    valid = true;
-}
-
-void Order::execute()
-{
-    if (valid) {
-        cout << "Executing Action" << endl;
+    // Custom comparator to sort Orders by priority
+    bool compareOrders(Order* order1, Order* order2)
+    {
+        return order1->getPriority() < order2->getPriority();
     }
+
+    // Helper function to check whether a territory can be attacked by a specific player.
+    // Returns `true` if the attacker already owns the target territory
+    // OR
+    // if there is no diplomacy between the attacker and the owner of the target.
+    bool canAttack(Player* attacker, Territory* target)
+    {
+        Player* ownerOfTarget = target->getTerritoryOwner(); ;
+        vector<Player*> diplomaticRelations = attacker->getDiplomaticRelations();
+        bool diplomacyWithOwnerOfTarget = find(diplomaticRelations.begin(), diplomaticRelations.end(), ownerOfTarget) != diplomaticRelations.end();
+
+        if (diplomacyWithOwnerOfTarget)
+        {
+            cout << attacker->getPlayerName() << " and " << ownerOfTarget << " cannot attack each other for the rest of this turn. ";
+        }
+
+        return attacker == ownerOfTarget || !diplomacyWithOwnerOfTarget;
+    }
+}
+
+Order::Order(): issuePlayer(nullptr), priority(4) {}
+
+Order::Order(Player* issuer, int priority) : issuePlayer(issuer), priority(priority) {}
+
+Order::Order(const Order &order) : issuePlayer(order.issuePlayer), priority(order.priority) {}
+
+// Operator overloading
+const Order &Order::operator=(const Order &order)
+{
+    issuePlayer = order.issuePlayer;
+    priority = order.priority;
+    return *this;
+}
+
+ostream &operator<<(ostream &output, const Order &order)
+{
+    return order.print_(output);
 }
 
 void Order::setTypeID(int num)
@@ -39,12 +65,23 @@ string Order::getType()
     return vecType.at(typeID);
 }
 
-std :: ostream& operator<<(std::ostream& output, const Order &order){
-    cout << "Object order"<< endl;
-    if (order.valid){
-        cout << "Order attribute"<< endl;
+// Validate and execute the Order. Invalid orders will have no effect.
+void Order::execute()
+{
+    if (validate())
+    {
+        execute_();
     }
-    return output;
+    else
+    {
+        cout << "Order invalid. Skipping..." << endl;
+    }
+}
+
+// Get order priority
+int Order::getPriority() const
+{
+    return priority;
 }
 
 OrderList:: OrderList(){
@@ -104,8 +141,8 @@ OrderList& OrderList ::operator=(const OrderList& orderList){
     return *this;
 }
 
-std :: ostream& operator<<(std::ostream& output, const OrderList &orderList){
-    std:: vector<Order*> temp = orderList.vec_order_list;
+std :: ostream& operator<<(std::ostream& output, const OrderList &list){
+    std:: vector<Order*> temp = list.vec_order_list;
     for (int i = 0; !temp.empty(); i++){
         Order* obj = temp.front();
         cout<<to_string(i)<< endl;
@@ -114,117 +151,413 @@ std :: ostream& operator<<(std::ostream& output, const OrderList &orderList){
     return output;
 }
 
-Deploy::Deploy()
-{
-    cout << "Deploying..." << endl;
-    setTypeID(0);
+void OrderList::addOrder(Order *order) {
+    vec_order_list.push_back(order);
 }
 
-Deploy::Deploy(Player* orderOwner, int armyUnits, Territory* territory) : Order(), orderOwner(orderOwner), armyUnits(armyUnits), territory(territory) {}
+Deploy::Deploy() : Order(nullptr, 1), numberOfArmy(0), target(nullptr) {}
 
-Deploy::~Deploy()
+Deploy::Deploy(Player* issuer, int numberOfArmies, Territory* destination) : Order(issuer, 1), numberOfArmy(numberOfArmies), target(destination) {}
+
+Deploy::Deploy(const Deploy &order) : Order(order), numberOfArmy(order.numberOfArmy), target(order.target) {}
+
+// Operator overloading
+const Deploy &Deploy::operator=(const Deploy &order)
 {
+    Order::operator=(order);
+    numberOfArmy = order.numberOfArmy;
+    target; order.target;
+    return *this;
 }
 
-string* Deploy::getType()
+ostream &Deploy::print_(ostream &output) const
 {
-    return &type1;
-}
+    output << "[DeployOrder]";
 
-
-std :: ostream& operator<<(std::ostream& output, const Deploy &deploy){
-    cout << "Object Deploy"<< endl;
-    if (deploy.valid){
-        cout << "Deploy attribute"<< endl;
+    if (target != nullptr)
+    {
+        output << " " << numberOfArmy << " armies to " << target->getTerritoryName();
     }
+
     return output;
 }
 
-Advance::Advance()
+// Return a pointer to a new instance of DeployOrder.
+Order* Deploy::clone() const
 {
-    cout << "Advancing..." << endl;
-    setTypeID(1);
+    return new Deploy(*this);
 }
 
-Advance::~Advance()
+// Add a number of armies to deploy to the order
+void Deploy::addArmies(int additional)
 {
+    numberOfArmy += additional;
 }
 
-std :: ostream& operator<<(std::ostream& output, const Advance &advance){
-    cout << "Object Advnace"<< endl;
-    if (advance.valid){
-        cout << "Advacne attribute"<< endl;
+// Checks that the DeployOrder is valid.
+bool Deploy::validate() const
+{
+    if (issuePlayer == nullptr || target == nullptr)
+    {
+        return false;
     }
+
+    vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
+    return find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), target) != currentPlayerTerritories.end();
+}
+
+
+// Executes the DeployOrder.
+void Deploy::execute_()
+{
+    target->setNumOfArmies(numberOfArmy);
+    cout << "Deployed " << numberOfArmy << " armies to " << target->getTerritoryName() << "." << endl;
+}
+
+Advance::Advance() : Order(), numberOfArmy(0), source(nullptr), target(nullptr) {}
+
+Advance::Advance(Player* issuer, int numberOfArmies, Territory* source, Territory* destination)
+        : Order(issuer, 4), numberOfArmy(numberOfArmies), source(source), target(destination) {}
+
+Advance::Advance(const Advance &order)
+        : Order(order), numberOfArmy(order.numberOfArmy), source(order.source), target(order.target) {}
+
+// Operator overloading
+const Advance &Advance::operator=(const Advance &order)
+{
+    Order::operator=(order);
+    numberOfArmy = order.numberOfArmy;
+    source = order.source;
+    target = order.target;
+    return *this;
+}
+
+ostream &Advance::print_(ostream &output) const
+{
+    output << "[AdvanceOrder]";
+
+    if (source != nullptr && target != nullptr)
+    {
+        output << " " << numberOfArmy << " armies from " << source->getTerritoryName() << " to " << target->getTerritoryName();
+    }
+
     return output;
 }
 
-Bomb::Bomb()
+// Return a pointer to a new instace of AdvanceOrder
+Order* Advance::clone() const
 {
-    cout << "Bombing..." << endl;
-    setTypeID(2);
+    return new Advance(*this);
 }
 
-Bomb::~Bomb()
+// Checks that the AdvanceOrder is valid.
+bool Advance::validate() const
 {
-}
-std :: ostream& operator<<(std::ostream& output, const Bomb &bomb){
-    cout << "Object Bomb"<< endl;
-    if (bomb.valid){
-        cout << "Bomb attribute"<< endl;
+    if (issuePlayer == nullptr || source == nullptr || target == nullptr)
+    {
+        return false;
     }
+
+    vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
+    bool validSourceTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), source) != currentPlayerTerritories.end();
+    bool hasAnyArmiesToAdvance = source->getNumOfArmies() > 0;
+
+    return validSourceTerritory && hasAnyArmiesToAdvance && canAttack(issuePlayer, target);
+}
+
+// Executes the AdvanceOrder.
+void Advance::execute_()
+{
+
+    if (!map->isAdjacent(source->getTerritoryName(), target->getTerritoryName())) {
+        std::cout << "Advance order is invalid - territories are not adjacent." << std::endl;
+        return;
+    }
+
+    Player* defender = target->getTerritoryOwner();
+    bool offensive = issuePlayer != defender;
+
+    // Recalculate how many armies could actually be moved (in case the state of the territory has changed due to an attack)
+    int movableArmiesFromSource = min(source->getNumOfArmies(), numberOfArmy);
+
+    if (offensive)
+    {
+        source->setNumOfArmies(source->getNumOfArmies()-movableArmiesFromSource);
+
+        int defendersKilled = round(movableArmiesFromSource * 0.6);
+        int attackersKilled = round(target->getNumOfArmies() * 0.7);
+
+        int survivingAttackers = max(movableArmiesFromSource - attackersKilled, 0);
+        int survivingDefenders = max(target->getNumOfArmies() - defendersKilled, 0);
+        target->setNumOfArmies(target->getNumOfArmies()-defendersKilled);
+
+        if (survivingDefenders > 0 || survivingAttackers <= 0)
+        {
+            source->setNumOfArmies(source->getNumOfArmies()+survivingAttackers);
+            cout << "Failed attack on " << target->getTerritoryName() << " with " << survivingDefenders << " enemy armies left standing.";
+
+            if (survivingAttackers > 0)
+            {
+                cout << " Retreating " << survivingAttackers << " attacking armies back to " << source->getTerritoryName() << endl;
+            }
+            else
+            {
+                cout << endl;
+            }
+        }
+        else
+        {
+            auto pos = std::find(defender->getTerritoryList().begin(), defender->getTerritoryList().end(), target->getTerritoryName());
+            issuePlayer->getTerritoryList().push_back(target);
+            defender->getTerritoryList().erase(defender->getTerritoryList().begin() + pos);
+            target->setNumOfArmies(target->getNumOfArmies()+survivingAttackers);
+            cout << "Successful attack on " << target->getTerritoryName() << ". " << survivingAttackers << " armies now occupy this territory." << endl;
+        }
+    }
+    else
+    {
+        source->setNumOfArmies(source->getNumOfArmies()-movableArmiesFromSource);
+        target->setNumOfArmies(target->getNumOfArmies()-movableArmiesFromSource);
+        cout << "Advanced " << movableArmiesFromSource << " armies from " << source->getTerritoryName() << " to " << target->getTerritoryName() << "." << endl;
+    }
+
+}
+
+Bomb::Bomb() : Order(), target(nullptr) {}
+
+Bomb::Bomb(Player* issuer, Territory* target) : Order(issuer, 4), target(target) {}
+
+Bomb::Bomb(const Bomb &order) : Order(order), target(order.target) {}
+
+// Operator overloading
+const Bomb &Bomb::operator=(const Bomb &order)
+{
+    Order::operator=(order);
+    target = order.target;
+    return *this;
+}
+
+ostream &Bomb::print_(ostream &output) const
+{
+    output << "[BombOrder]";
+
+    if (target != nullptr)
+    {
+        output << " Target: " << target->getTerritoryName();
+    }
+
     return output;
 }
 
-Blockade::Blockade()
+// Return a pointer to a new instance of BombOrder.
+Order* Bomb::clone() const
 {
-    cout << "Bloackade incoming..." << endl;
-    setTypeID(3);
+    return new Bomb(*this);
 }
 
-Blockade::~Blockade()
+// Checks that the BombOrder is valid.
+bool Bomb::validate() const
 {
-}
-
-std :: ostream& operator<<(std::ostream& output, const Blockade &blockade){
-    cout << "Object Blockade"<< endl;
-    if (blockade.valid){
-        cout << "Blockade attribute"<< endl;
+    if (issuePlayer == nullptr || issuePlayer == nullptr)
+    {
+        return false;
     }
+
+    vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
+    bool validTargetTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), target) == currentPlayerTerritories.end();
+    return validTargetTerritory && canAttack(issuePlayer, target);
+}
+
+// Executes the BombOrder.
+void Bomb::execute_()
+{
+    int armiesOnTarget = target->getNumOfArmies();
+    target->setNumOfArmies(target->getNumOfArmies()- (armiesOnTarget / 2));
+    cout << "Bombed " << armiesOnTarget / 2 << " enemy armies on " << target->getTerritoryName() << ". ";
+    cout << target->getNumOfArmies() << " remaining." << endl;
+}
+
+Blockade::Blockade() : Order(nullptr, 3), territory(nullptr) {}
+
+Blockade::Blockade(Player* issuer, Territory* territory) : Order(issuer, 3), territory(territory) {}
+
+Blockade::Blockade(const Blockade &order) : Order(order), territory(order.territory) {}
+
+// Operator overloading
+const Blockade &Blockade::operator=(const Blockade &order)
+{
+    Order::operator=(order);
+    territory = order.territory;
+    return *this;
+}
+
+ostream &Blockade::print_(ostream &output) const
+{
+    output << "[BlockadeOrder]";
+
+    if (territory != nullptr)
+    {
+        output << " Territory: " << territory->getTerritoryName() << " (" << territory->getNumOfArmies() << " present)";
+    }
+
     return output;
 }
 
-Airlift::Airlift()
+// Return a pointer to a new instance of BlockadeOrder.
+Order* Blockade::clone() const
 {
-    cout << "Airlifitng..." << endl;
-    setTypeID(4);
+    return new Blockade(*this);
 }
 
-Airlift::~Airlift()
+// Checks that the BlockadeOrder is valid.
+bool Blockade::validate() const
 {
-}
-
-std :: ostream& operator<<(std::ostream& output, const Airlift &airlift){
-    cout << "Object Airlift"<< endl;
-    if (airlift.valid){
-        cout << "Airlift attribute"<< endl;
+    if (issuePlayer == nullptr || territory == nullptr)
+    {
+        return false;
     }
+
+    vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
+    return find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), territory) != currentPlayerTerritories.end();
+}
+
+// Executes the BlockadeOrder.
+void Blockade::execute_()
+{
+    territory->setNumOfArmies(territory->getNumOfArmies());
+    GameEngine::assignToNeutralPlayer(territory_);
+    cout << "Blockade called on " << territory_->getName() << ". ";
+    cout << territory_->getNumberOfArmies() << " neutral armies now occupy this territory." << endl;
+}
+
+Airlift::Airlift() : Order(nullptr, 2), numberOfArmy(0), source(nullptr), target(nullptr) {}
+
+Airlift::Airlift(Player* issuer, int numberOfArmies, Territory* source, Territory* destination)
+        : Order(issuer, 2), numberOfArmy(numberOfArmies), source(source), target(destination) {}
+
+Airlift::Airlift(const Airlift &order) : Order(order), numberOfArmy(order.numberOfArmy), source(order.source), target(order.target) {}
+
+// Operator overloading
+const Airlift &Airlift::operator=(const Airlift &order)
+{
+    Order::operator=(order);
+    numberOfArmy = order.numberOfArmy;
+    source = order.source;
+    target = order.source;
+    return *this;
+}
+
+ostream &Airlift::print_(ostream &output) const
+{
+    output << "[AirliftOrder]";
+
+    if (source != nullptr && target != nullptr)
+    {
+        output << " " << numberOfArmy << " armies from " << source->getTerritoryName() << " to " << target->getTerritoryName();
+    }
+
     return output;
 }
 
-Negotiate::Negotiate()
+// Return a pointer to a new instance of AirliftOrder.
+Order* Airlift::clone() const
 {
-    cout << "Negotiating..." << endl;
-    setTypeID(5);
+    return new Airlift(*this);
 }
 
-Negotiate::~Negotiate()
+// Checks that the AirliftOrder is valid.
+bool Airlift::validate() const
 {
-}
-
-std :: ostream& operator<<(std::ostream& output, const Negotiate &negotiate){
-    cout << "Negotiate Deploy"<< endl;
-    if (negotiate.valid){
-        cout << "Negotiate attribute"<< endl;
+    if (issuePlayer == nullptr || source == nullptr || target == nullptr || source == target)
+    {
+        return false;
     }
+
+    auto currentPlayerTerritories = issuePlayer->getTerritoryList();
+
+    bool validSourceTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), source) != currentPlayerTerritories.end();
+    bool validDestinationTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), target) != currentPlayerTerritories.end();
+    bool hasAnyArmiesToAirlift = source->getNumOfArmies() > 0;
+    return validSourceTerritory && validDestinationTerritory && hasAnyArmiesToAirlift;
+}
+
+// Executes the AirliftOrder.
+void Airlift::execute_()
+{
+    // Recalculate how many armies could actually be moved in case the state of the territory has changed due to an attack
+    int movableArmiesFromSource = min(source->getNumOfArmies(), numberOfArmy);
+
+    source->setNumOfArmies(source->getNumOfArmies()-movableArmiesFromSource);
+    target->setNumOfArmies(target->getNumOfArmies()+movableArmiesFromSource);
+
+    cout << "Airlifted " << movableArmiesFromSource << " armies from " << source->getTerritoryName() << " to " << target->getTerritoryName() << "." << endl;
+}
+
+Negotiate::Negotiate() : Order(), targetPlayer(nullptr) {}
+
+Negotiate::Negotiate(Player* issuer, Player* target) : Order(issuer, 4), targetPlayer(target) {}
+
+Negotiate::Negotiate(const Negotiate &order) : Order(order), targetPlayer(order.targetPlayer) {}
+
+// Operator overloading
+const Negotiate &Negotiate::operator=(const Negotiate &order)
+{
+    Order::operator=(order);
+    targetPlayer = order.targetPlayer;
+    return *this;
+}
+
+ostream &Negotiate::print_(ostream &output) const
+{
+    output << "[NegotiateOrder]";
+
+    if (issuePlayer != nullptr && targetPlayer != nullptr)
+    {
+        output << " Initiator: " << issuePlayer->getPlayerName() << ", Target: " << targetPlayer->getPlayerName();
+    }
+
     return output;
 }
+
+// Return a pointer to a new instance of NegotiateOrder.
+Order* Negotiate::clone() const
+{
+    return new Negotiate(*this);
+}
+
+// Checks that the NegotiateOrder is valid.
+bool Negotiate::validate() const
+{
+    if (issuePlayer == nullptr || targetPlayer == nullptr)
+    {
+        return false;
+    }
+
+    return issuePlayer != targetPlayer;
+}
+
+// Executes the NegotiateOrder.
+void Negotiate::execute_()
+{
+    issuePlayer->addDiplomaticRelation(targetPlayer);
+    targetPlayer->addDiplomaticRelation(issuePlayer);
+    cout << "Negotiated diplomacy between " << issuePlayer->getPlayerName()<< " and " << targetPlayer->getPlayerName() << "." << endl;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
