@@ -49,6 +49,7 @@ class GameEngine {
         //For Demo
         void setSelectedMap(const Map& map);
         void setAllPlayers(const vector<Player*>& players);
+        void initializeGame(Map& map, vector<Player*>& players);
       
 };
 

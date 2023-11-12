@@ -10,7 +10,6 @@ void testGameStates() {
     //engineObj.play();
 
     system("pause");
-
    
 }
 
@@ -34,8 +33,10 @@ void testMainGameLoop() {
 
     Player* p1 = new Player;
     p1->setPlayerID("john");
+    p1->setReinforcementPool(50);
     Player* p2 = new Player;
     p2->setPlayerID("mike");
+    p2->setReinforcementPool(50);
 
     vector<Player*> allPlayers;
     allPlayers.push_back(p1);
@@ -59,14 +60,17 @@ void testMainGameLoop() {
     t4->setTerritoryOwner(p2);
 
 
+    // Create a game engine instance
     GameEngine game;
-    // game.setAllPlayers(allPlayers);
-    // game.setSelectedMap(map);
-
-    
     game.startupPhase();
-    game.reinforcementPhase();
-    game.issueOrdersPhase();
+    game.mainGameLoop();
+
+    // Initialize the game with your arbitrary map and players
+    //game.initializeGame(map, allPlayers);
+
+    // Now you can test your game logic without the startupPhase() interfering
+    //game.reinforcementPhase();
+    //game.issueOrdersPhase();
 
     
     
@@ -84,8 +88,6 @@ void testMainGameLoop() {
         //GameEngine game;
         //game.startupPhase();
         //game.reinforcementPhase();
-
-
 
 
 //Prove a player will only issue deploy orders and no other kind of orders if they still have anmy units in their reinforcement pool

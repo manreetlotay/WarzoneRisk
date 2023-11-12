@@ -466,23 +466,49 @@ void Player::issueOrder() {
 
         Card* selectedCard = handOfCards->hand[cardChoice - 1];
 
-        //Play the Card
         //Use the selected card based on its type
+        Territory* targetTerritory = nullptr;
+        Territory* sourceTerritory = nullptr;
+        Player* targetPlayer = nullptr;
+        int numArmies = 0;
+        int movedArmies = 0;
+        cout << "\n" << endl;
         switch (selectedCard->getValue()) {
             case 'B':
-                // Implement the Bomb card logic here
+                //Bomb Order
+                targetTerritory = toAttack.front();
+                //order = new Bomb(this, targetTerritory);
+                cout << "ISSUE BOMB ORDER ON " << targetTerritory->getTerritoryName() << ", OWNED BY " << targetTerritory->getTerritoryOwner()->getPlayerID() << endl;
                 break;
             case 'R':
-                // Implement the Reinforcement card logic here  
+                this->reinforcementPool += 10;
+                cout << "YOU HAVE PLAYED THE REINFORCEMENT CARD! YOU HAVE BEEN REINFORCED WITH 10 ARMY UNITS" << endl;  
                 break;
             case 'L':
-                // Implement the Blockade card logic here
+                //Blockade Order
+                targetTerritory = toDefend.front();
+                //order = new Blockade(this, targetTerritory);
+                cout << "ISSUE BLOCKADE ORDER ON " << targetTerritory->getTerritoryName() << ", OWNED BY " << targetTerritory->getTerritoryOwner()->getPlayerID() << endl;
                 break;
             case 'A':
-                // Implement the Airlift card logic here
+                //Airlift order
+                sourceTerritory = toDefend.back();
+                targetTerritory = toDefend.front();
+
+                if (sourceTerritory->getNumOfArmies() <= 0) {
+                    movedArmies = 1;
+                }
+
+                numArmies = (rand() % movedArmies) + 1;
+                //order = new Airlift(this, numArmies, sourceTerritory, targetTerritory);
+                cout << "ISSUE AIRLIFT ORDER FROM " << sourceTerritory->getTerritoryName() << " TO " << targetTerritory->getTerritoryName() << ", OWNED BY " << this->getPlayerID() << endl;
+
                 break;
             case 'D':
-                // Implement the Diplomacy card logic here
+                //Negotiate Order
+                targetPlayer = toAttack.front()->getTerritoryOwner();
+                //order = new Negotiate(this, targetPlayer);
+                cout << "ISSUE NEGOTIATE ORDER ON PLAYER " << targetPlayer->getPlayerID() << endl;
                 break;
             default:
                 cout << "**Invalid card type. Please try again.**" << endl;

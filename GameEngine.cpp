@@ -682,7 +682,13 @@ void GameEngine::issueOrdersPhase() {
 
 void GameEngine::executeOrdersPhase() {
 
-    cout << "Execution phase" << endl;    
+    cout << "\nExecution phase\n" << endl; 
+    // for(Player* player: allPlayers) {
+    //     for(Order* order: player->getOrderList()) {
+    //         order->execute();
+    //     }
+    // } 
+
 }
 
 
@@ -704,7 +710,7 @@ void GameEngine::removePlayers() {
         if (!player->getTerritoryList().empty()) {
             survivingPlayers.push_back(player);
         } else {
-            cout << "Player " << player->getPlayerID() << " has been eliminated." << endl;
+            cout << "OOPS! PLAYER " << player->getPlayerID() << " has been eliminated.................................................................................................................................." << endl;
         }
     }
 
@@ -712,36 +718,96 @@ void GameEngine::removePlayers() {
 }
 
 
+// void GameEngine::mainGameLoop() {
+
+//     int maxRounds = 3;
+//     int currentRound = 1;
+//     Player* winner = nullptr;
+
+//     while (currentRound < maxRounds) {
+//         reinforcementPhase();  // Implement this function
+//         issueOrdersPhase();    // Implement this function
+//         executeOrdersPhase(); // Implement this function
+
+//         // Check for a winner
+//         winner = checkWinner();
+//         if (winner) {
+//             cout << "Player " << winner->getPlayerID() << " wins!" << endl;
+//             break;
+//         }
+
+//         // if (currentRound == 1) {
+//         //      int randomIndex = rand() % allPlayers.size();  // Randomly choose a player
+//         //     Player* playerToRemove = allPlayers[randomIndex];
+
+//         //     //Remove all the player's territories 
+//         //     cout << "Removing player's territories" << endl;
+//         //     playerToRemove->setTerritoryList(vector<Territory*>());
+//         // }
+
+//         //Check for players with zero territories and remove them
+//         removePlayers();
+
+//         currentRound++;
+//     }
+
+//     if (!winner) {
+//         cout << "The game ends in a tie. No winner." << endl;
+//     } 
+
+   
+// }
+
+
 void GameEngine::mainGameLoop() {
 
-    int maxRounds = 3;
-    int currentRound = 0;
+    int maxRounds = 5;
+    int currentRound = 1; // Start from round 1
     Player* winner = nullptr;
 
-    while (currentRound < maxRounds) {
+    while (currentRound <= maxRounds) {
         reinforcementPhase();  // Implement this function
         issueOrdersPhase();    // Implement this function
-        executeOrdersPhase(); // Implement this function
+        executeOrdersPhase();  // Implement this function
 
         // Check for a winner
         winner = checkWinner();
         if (winner) {
-            cout << "Player " << winner->getPlayerID() << " wins!" << endl;
+            cout << "PLAYER " << winner->getPlayerID() << " wins!" << endl;
             break;
         }
 
-        //Check for players with zero territories and remove them
-        removePlayers();
+        // Manually remove a player's territories in round 2
+        if (currentRound == 2) {
+            if (!allPlayers.empty()) {
+                int randomIndex = rand() % allPlayers.size();  // Randomly choose a player
+                Player* playerToRemove = allPlayers[randomIndex];
+
+                // Remove all the player's territories
+                cout << "Removing territories from Player " << playerToRemove->getPlayerID() << endl;
+                playerToRemove->setTerritoryList(vector<Territory*>());
+
+                // Check for players with zero territories and remove them
+                removePlayers();
+            }
+        }
+
+        // // After removing players, check if there are still players left
+        // if (allPlayers.size() < 2) {
+        //     // If there are less than 2 players, the game cannot continue
+        //     break;
+        // }
 
         currentRound++;
     }
 
     if (!winner) {
         cout << "The game ends in a tie. No winner." << endl;
-    } 
-
-   
+    }
 }
+
+
+
 
 
 void GameEngine::setSelectedMap(const Map& map) {
@@ -750,5 +816,10 @@ void GameEngine::setSelectedMap(const Map& map) {
 
 // Implementation of setAllPlayers
 void GameEngine::setAllPlayers(const vector<Player*>& players) {
+    allPlayers = players;
+}
+
+ void GameEngine::initializeGame(Map& map, vector<Player*>& players) {
+    selectedMap = map;
     allPlayers = players;
 }
