@@ -85,6 +85,9 @@ int Order::getPriority() const
     return priority;
 }
 
+Order::~Order() {
+}
+
 OrderList:: OrderList(){
     std :: cout<<"Orderlist object created"<<endl;
 }
@@ -202,11 +205,9 @@ bool Deploy::validate() const
     {
         return false;
     }
-
     vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
     return find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), target) != currentPlayerTerritories.end();
 }
-
 
 // Executes the DeployOrder.
 void Deploy::execute_()
@@ -214,6 +215,8 @@ void Deploy::execute_()
     target->setNumOfArmies(numberOfArmy);
     cout << "Deployed " << numberOfArmy << " armies to " << target->getTerritoryName() << "." << endl;
 }
+
+Deploy::~Deploy()= default;
 
 Advance::Advance() : Order(), numberOfArmy(0), source(nullptr), target(nullptr) {}
 
@@ -259,12 +262,11 @@ bool Advance::validate() const
         return false;
     }
 
-
     vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
-    bool hasAdjacent = source->isAdjacent(source, target);
+    //bool hasAdjacent = source->isADJ(source->getTerritoryName(), target->getTerritoryName());
     bool validSourceTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), source) != currentPlayerTerritories.end();
     bool hasAnyArmiesToAdvance = source->getNumOfArmies() > 0;
-    return validSourceTerritory && hasAnyArmiesToAdvance && canAttack(issuePlayer, target) && hasAdjacent;
+    return validSourceTerritory && hasAnyArmiesToAdvance && canAttack(issuePlayer, target);
 }
 
 // Executes the AdvanceOrder.
@@ -304,9 +306,9 @@ void Advance::execute_()
         }
         else
         {
-            auto pos = std::find(defender->getTerritoryList().begin(), defender->getTerritoryList().end(), target->getTerritoryName());
-            issuePlayer->getTerritoryList().push_back(target);
-            defender->getTerritoryList().erase(defender->getTerritoryList().begin()+pos);
+            //auto pos = std::find(defender->getTerritoryList().begin(), defender->getTerritoryList().end(), target->getTerritoryName());
+            //issuePlayer->getTerritoryList().push_back(target);
+            //defender->getTerritoryList().erase(defender->getTerritoryList().begin()+pos);
             target->setNumOfArmies(target->getNumOfArmies()+survivingAttackers);
             cout << "Successful attack on " << target->getTerritoryName() << ". " << survivingAttackers << " armies now occupy this territory." << endl;
         }
@@ -319,6 +321,8 @@ void Advance::execute_()
     }
 
 }
+
+Advance::~Advance()= default;
 
 Bomb::Bomb() : Order(), target(nullptr) {}
 
@@ -359,10 +363,11 @@ bool Bomb::validate() const
     {
         return false;
     }
-    bool isAdjacent = source->isAdjacent(issuePlayer, target);
+
     vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
+    //bool isAdjacent = target->isADJ(target->getTerritoryName(), issuePlayer->getTerritoryList());
     bool validTargetTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), target) == currentPlayerTerritories.end();
-    return validTargetTerritory && canAttack(issuePlayer, target) && isAdjacent;
+    return validTargetTerritory && canAttack(issuePlayer, target);
 }
 
 // Executes the BombOrder.
@@ -373,6 +378,8 @@ void Bomb::execute_()
     cout << "Bombed " << armiesOnTarget / 2 << " enemy armies on " << target->getTerritoryName() << ". ";
     cout << target->getNumOfArmies() << " remaining." << endl;
 }
+
+Bomb::~Bomb() = default;
 
 Blockade::Blockade() : Order(nullptr, 3), territory(nullptr) {}
 
@@ -426,6 +433,8 @@ void Blockade::execute_()
     cout << "Blockade called on " << territory->getTerritoryOwner()->getPlayerID() << ". ";
     cout << territory->getNumOfArmies() << " neutral armies now occupy this territory." << endl;
 }
+
+Blockade::~Blockade()  = default;
 
 Airlift::Airlift() : Order(nullptr, 2), numberOfArmy(0), source(nullptr), target(nullptr) {}
 
@@ -490,6 +499,8 @@ void Airlift::execute_()
     cout << "Airlifted " << movableArmiesFromSource << " armies from " << source->getTerritoryName() << " to " << target->getTerritoryName() << "." << endl;
 }
 
+Airlift ::~Airlift()  = default;
+
 Negotiate::Negotiate() : Order(), targetPlayer(nullptr) {}
 
 Negotiate::Negotiate(Player* issuer, Player* target) : Order(issuer, 4), targetPlayer(target) {}
@@ -540,6 +551,8 @@ void Negotiate::execute_()
     targetPlayer->addDiplomaticRelation(issuePlayer);
     cout << "Negotiated diplomacy between " << issuePlayer->getPlayerID()<< " and " << targetPlayer->getPlayerID() << "." << endl;
 }
+
+Negotiate :: ~Negotiate() = default;
 
 
 

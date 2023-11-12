@@ -63,6 +63,7 @@ public:
     Order* clone() const;
     void addArmies(int additional);
     bool validate() const;
+    ~Deploy();
 
 
 protected:
@@ -75,11 +76,17 @@ private:
 };
 
 class Advance : public Order{
-    Advance();
-    Advance(Player* issuer, int numberOfArmy, Territory* source, Territory* target);
     Advance(const Advance &order);
     const Advance &operator=(const Advance &order);
     Order* clone() const;
+
+public:
+    Advance();
+
+    Advance(Player* issuer, int numberOfArmy, Territory* source, Territory* target);
+
+    ~Advance();
+
     bool validate() const;
 
 protected:
@@ -101,6 +108,7 @@ public:
     const Bomb &operator=(const Bomb &order);
     Order* clone() const;
     bool validate() const;
+    ~Bomb();
 
 protected:
     void execute_();
@@ -119,6 +127,7 @@ public:
     const Blockade &operator=(const Blockade &order);
     Order* clone() const;
     bool validate() const;
+    ~Blockade();
 
 protected:
     void execute_();
@@ -137,6 +146,7 @@ public:
     const Airlift &operator=(const Airlift &order);
     Order* clone() const;
     bool validate() const;
+    ~Airlift();
 
 protected:
     void execute_();
@@ -157,6 +167,7 @@ public:
     const Negotiate &operator=(const Negotiate &order);
     Order* clone() const;
     bool validate() const;
+    ~Negotiate();
 
 protected:
     void execute_();

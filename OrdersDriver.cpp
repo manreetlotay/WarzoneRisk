@@ -1,52 +1,53 @@
+//
+// Created by hengy on 11/9/2023.
+//
+
 #include "Orders.h"
+#include "Player.h"
 
 using namespace std;
 
+void testOrderExecution() {
+    // Create players, territories, and other necessary game elements
+    Player* player1 = new Player;
+    Player* player2 = new Player;
+    Territory* t1 = new Territory("Quebec");
+    Territory* t2 = new Territory("BC");
 
-
-void testOrdersList()
-{
-    cout << "test OrderDriver...\n" << endl;
-    OrderList anOrderList;
-
-    Deploy deploy;
-    Advance advance;
-    Bomb bomb;
-    Blockade blockade;
-    Airlift airlift;
-    Negotiate negotiate;
-
-    anOrderList.set_order_list(&deploy);
-    anOrderList.set_order_list(&advance);
-    anOrderList.set_order_list(&advance);
-    anOrderList.set_order_list(&blockade);
-    anOrderList.set_order_list(&airlift);
-    anOrderList.set_order_list(&negotiate);
-
-
-    //print orderlist
-    cout << "\n the orderlist contains: " << endl;
-    for (int i = 0; i < anOrderList.get_order_list()->size(); i++) {
-        cout <<"  "<< anOrderList.get_order_list()->at(i)->getType() << endl;
+    // (1) Validate and execute each order
+    // Example for an Advance order
+    Advance advanceOrder(player1,10, t1, t2); // Sample parameters
+    if (advanceOrder.validate()) {
+        advanceOrder.execute();
+        std::cout << "Advance order executed." << std::endl;
+    } else {
+        std::cout << "Advance order validation failed." << std::endl;
     }
 
-    //delete an order
-    anOrderList.remove(&deploy);
-
-    //print orderlist
-    cout << "\n the orderlist contains: " << endl;
-    for (int i = 0; i < anOrderList.get_order_list()->size(); i++) {
-        cout << "  " << anOrderList.get_order_list()->at(i)->getType() << endl;
+    // (2) Transfer ownership on successful conquest
+    // Check and demonstrate ownership transfer
+    if (t2->getTerritoryOwner() == player1) {
+        std::cout << "Ownership of territory transferred to Player 1." << std::endl;
     }
 
-    //move an order
-    anOrderList.move(0,4);
-    //anOrderList.move(0, 5);
-    anOrderList.move(0, 8);//invalid
-    //print orderlist
-    cout << "\n the orderlist contains: " << endl;
-    for (int i = 0; i < anOrderList.get_order_list()->size(); i++) {
-        cout << "  " << anOrderList.get_order_list()->at(i)->getType() << endl;
-    }
+    // (3) Award card for conquering territory
+    // Implement logic to award card and demonstrate it
+    // ...
 
+    // (4) Prevent attacks between players involved in negotiate order
+    // Create and demonstrate negotiate order
+    Negotiate negotiateOrder(player1, player2);
+    negotiateOrder.execute();
+    // Implement logic to demonstrate prevention of attacks
+    // ...
+
+    // (6) Demonstrate all orders can be issued and executed
+    // Create and execute different types of orders to demonstrate this
+    // ...
+
+    std::cout << "Order execution tests completed." << std::endl;
+}
+int main() {
+    testOrderExecution();
+    return 0;
 }

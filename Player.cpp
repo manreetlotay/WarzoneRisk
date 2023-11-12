@@ -5,7 +5,7 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 
 #include "Player.h"
 #include <iostream>
-#include <algorithm> 
+#include <algorithm>
 #include <set>
 
 // default constructor
@@ -14,10 +14,10 @@ Player::Player() : handOfCards(nullptr), orderList(nullptr), territoryList(vecto
 
 //Parameterized Constructor
 Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList, string playerID)
-    : handOfCards(handOfCards), orderList(orderList), territoryList(territoryList), playerID(playerID) {}
+        : handOfCards(handOfCards), orderList(orderList), territoryList(territoryList), playerID(playerID) {}
 
- //destructor
- Player::~Player() {
+//destructor
+Player::~Player() {
 
     //Deallocation memory for handOfCards and orderList and preventing dangling pointers
     delete handOfCards;
@@ -31,7 +31,7 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
         delete territory;
     }
     territoryList.clear();
- }
+}
 
 std::vector<Player*> Player::getDiplomaticRelations() const
 {
@@ -43,11 +43,11 @@ void Player::addDiplomaticRelation(Player* player)
     diplomaticRelations.push_back(player);
 }
 
- //copy constructor
- Player::Player(const Player& ogPlayer) {
+//copy constructor
+Player::Player(const Player& ogPlayer) {
 
     //copying handOfCards
-    if(ogPlayer.handOfCards != nullptr) {   
+    if(ogPlayer.handOfCards != nullptr) {
         this->handOfCards = new Hand(*(ogPlayer.handOfCards));
     }
     else {
@@ -56,7 +56,7 @@ void Player::addDiplomaticRelation(Player* player)
 
     //copying orderList
     if(ogPlayer.orderList != nullptr) {
-        this->orderList = new OrderList(*(ogPlayer.orderList));  
+        this->orderList = new OrderList(*(ogPlayer.orderList));
     }
     else {
         this->orderList = nullptr;
@@ -65,7 +65,7 @@ void Player::addDiplomaticRelation(Player* player)
     //copying territoryList
     if(!ogPlayer.territoryList.empty()) {
         //deep copy each Territory from one list to the other
-         for (Territory* territory: ogPlayer.territoryList) {
+        for (Territory* territory: ogPlayer.territoryList) {
             this->territoryList.push_back(new Territory(*territory));
         }
     }
@@ -76,18 +76,18 @@ void Player::addDiplomaticRelation(Player* player)
 
     //copying playerID
     this->playerID = ogPlayer.playerID;
- }
+}
 
- //assignment operator
- Player& Player::operator = (const Player& player) {
+//assignment operator
+Player& Player::operator = (const Player& player) {
 
     //self assignment
     if (this == &player) {
-        return *this; 
+        return *this;
     }
 
     //copying handOfCards
-    if(player.handOfCards != nullptr) {   
+    if(player.handOfCards != nullptr) {
         this->handOfCards = new Hand(*(player.handOfCards));
     }
     else {
@@ -96,7 +96,7 @@ void Player::addDiplomaticRelation(Player* player)
 
     //copying orderList
     if(player.orderList != nullptr) {
-        this->orderList = new OrderList(*(player.orderList));  
+        this->orderList = new OrderList(*(player.orderList));
     }
     else {
         this->orderList = nullptr;
@@ -105,7 +105,7 @@ void Player::addDiplomaticRelation(Player* player)
     //copying territoryList
     if(!player.territoryList.empty()) {
         //deep copy each Territory from one list to the other
-         for (Territory* territory: player.territoryList) {
+        for (Territory* territory: player.territoryList) {
             this->territoryList.push_back(new Territory(*territory));
         }
     }
@@ -118,10 +118,10 @@ void Player::addDiplomaticRelation(Player* player)
     this->playerID = player.playerID;
 
     return *this;
- }
+}
 
- //stream insertion operator overloader
- std::ostream &operator<<(std::ostream &output, Player &player) {
+//stream insertion operator overloader
+std::ostream &operator<<(std::ostream &output, Player &player) {
 
     Hand* handOfCards = player.getHandOfCards();
     OrderList* orderList = player.getOrderList();
@@ -141,10 +141,10 @@ void Player::addDiplomaticRelation(Player* player)
     else {
         //Print player's hand of cards
         output << "Player's Hand of Cards: " << std::endl;
-            // Iterate through the cards in the player's hand and print them
-            for (Card* card : handOfCards->hand) {
-                card->Play();
-            }
+        // Iterate through the cards in the player's hand and print them
+        for (Card* card : handOfCards->hand) {
+            card->Play();
+        }
     }
 
     //print player's orderList message if its empty
@@ -154,10 +154,10 @@ void Player::addDiplomaticRelation(Player* player)
     else {
         //print player's list of orders
         output << "Player's List of Orders: " << std::endl;
-            // Iterate through the order list and print each order's type
-            for (int i = 0; i < orderList->get_order_list()->size(); i++) {
-                output << "  " << orderList->get_order_list()->at(i)->getType() << std::endl;
-            }
+        // Iterate through the order list and print each order's type
+        for (int i = 0; i < orderList->get_order_list()->size(); i++) {
+            output << "  " << orderList->get_order_list()->at(i)->getType() << std::endl;
+        }
     }
 
     //print player's territoryList message if its empty
@@ -167,39 +167,39 @@ void Player::addDiplomaticRelation(Player* player)
     else {
         //print player's list of territories
         output << "Player's List of Territories:" << std::endl;
-            //Iterate through territoryList and print name of each Territory object
-            for (Territory* territory : player.territoryList) {
-                output << "Territory Name: " << territory->getTerritoryName() << std::endl;
-                //other info about territory to print...
-            }
+        //Iterate through territoryList and print name of each Territory object
+        for (Territory* territory : player.territoryList) {
+            output << "Territory Name: " << territory->getTerritoryName() << std::endl;
+            //other info about territory to print...
+        }
     }
 
     return output;
 }
 
- //getters
- Hand* Player::getHandOfCards() {
+//getters
+Hand* Player::getHandOfCards() {
     return handOfCards;
- };
+};
 
- OrderList* Player::getOrderList() {
+OrderList* Player::getOrderList() {
     return orderList;
- };
+};
 
- vector<Territory*> Player::getTerritoryList() {
+vector<Territory*> Player::getTerritoryList() {
     return territoryList;
- };
+};
 
- string Player::getPlayerID() {
+string Player::getPlayerID() {
     return playerID;
- }
+}
 
- int Player::getReinforcementPool() {
+int Player::getReinforcementPool() {
     return reinforcementPool;
- }
+}
 
- //setters
- void Player::setHand(Hand* newHandOfCards) {
+//setters
+void Player::setHand(Hand* newHandOfCards) {
     handOfCards = newHandOfCards;
 }
 
@@ -251,7 +251,7 @@ void Player::issueOrder() {
 
     while (!deployedAll) {
         //cout << "You currently have " << this->reinforcementPool << " army units in your reinforcement pool.\n" << endl;
-        deployedAll = true; 
+        deployedAll = true;
 
         // Loop through the territories to defend
         for (int i = 0; i < toDefend.size(); i++) {
@@ -299,7 +299,7 @@ void Player::issueOrder() {
 
 //***********ADVANCE***********************
 
- char ynAdvanceOrder;
+    char ynAdvanceOrder;
     cout << playerID << "DO YOU WISH TO ISSUE ADVANCE ORDERS (Y/N)?" << endl;
     cin >> ynAdvanceOrder;
     cin.ignore();
@@ -382,8 +382,8 @@ void Player::issueOrder() {
                 // fromTerritory->setNumOfArmies(fromTerritory->getNumOfArmies() - numUnitsToAdvance);
 
                 cout << "\nADVANCE ORDER #" << orderNumber << " ISSUED: " << numUnitsToAdvance << " units advanced from " << fromTerritory->getTerritoryName() << " to " << toTerritory->getTerritoryName() << "." << endl;
-            
-            
+
+
             } else { // Advance units to an enemy territory
 
                 // Display the territories to defend
@@ -457,50 +457,50 @@ void Player::issueOrder() {
     }
 
     cout << "Here are the cards in your hand:" << endl;
-        for (int i = 0; i < handOfCards->hand.size(); i++) {
-            cout << i + 1 << ". " << *handOfCards->hand[i] << endl;
+    for (int i = 0; i < handOfCards->hand.size(); i++) {
+        cout << i + 1 << ". " << *handOfCards->hand[i] << endl;
+    }
+
+    int cardChoice;
+    do {
+        cout << "Choose the card you want to use (1-" << handOfCards->hand.size() << "): ";
+        cin >> cardChoice;
+        cin.ignore();
+
+        if (cardChoice < 1 || cardChoice > handOfCards->hand.size()) {
+            cout << "Invalid card choice. Please try again." << endl;
         }
+    } while (cardChoice < 1 || cardChoice > handOfCards->hand.size());
 
-        int cardChoice;
-        do {
-            cout << "Choose the card you want to use (1-" << handOfCards->hand.size() << "): ";
-            cin >> cardChoice;
-            cin.ignore();
+    Card* selectedCard = handOfCards->hand[cardChoice - 1];
 
-            if (cardChoice < 1 || cardChoice > handOfCards->hand.size()) {
-                cout << "Invalid card choice. Please try again." << endl;
-            }
-        } while (cardChoice < 1 || cardChoice > handOfCards->hand.size());
-
-        Card* selectedCard = handOfCards->hand[cardChoice - 1];
-
-        //Play the Card
-        // Use the selected card based on its type
-        switch (selectedCard->getValue()) {
-            case 'B':
-                // Implement the Bomb card logic here
-                break;
-            case 'R':
-                // Implement the Reinforcement card logic here  
-                break;
-            case 'L':
-                // Implement the Blockade card logic here
-                break;
-            case 'A':
-                // Implement the Airlift card logic here
-                break;
-            case 'D':
-                // Implement the Diplomacy card logic here
-                break;
-            default:
-                cout << "**Invalid card type. Please try again.**" << endl;
-                break;
-        }
+    //Play the Card
+    // Use the selected card based on its type
+    switch (selectedCard->getValue()) {
+        case 'B':
+            // Implement the Bomb card logic here
+            break;
+        case 'R':
+            // Implement the Reinforcement card logic here
+            break;
+        case 'L':
+            // Implement the Blockade card logic here
+            break;
+        case 'A':
+            // Implement the Airlift card logic here
+            break;
+        case 'D':
+            // Implement the Diplomacy card logic here
+            break;
+        default:
+            cout << "**Invalid card type. Please try again.**" << endl;
+            break;
+    }
 
 
-         // Remove the used card from the player's hand
-        handOfCards->hand.erase(handOfCards->hand.begin() + cardChoice - 1);
-    
+    // Remove the used card from the player's hand
+    handOfCards->hand.erase(handOfCards->hand.begin() + cardChoice - 1);
+
 }
 
 //Return List of territories to be defended by Player
@@ -533,24 +533,29 @@ vector<Territory*> Player::toAttack() {
         for (Territory* adjacentTerritory : adjacentTerritories) {
 
             //Check if the adjacent territory is not owned by the player
-                if (adjacentTerritory->getTerritoryOwner() != this) {
-                    //Prevent duplicates in terrToAttack
-                    if (find(terrToAttack.begin(), terrToAttack.end(), adjacentTerritory) == terrToAttack.end()) {
-                        terrToAttack.push_back(adjacentTerritory);
-                    }
+            if (adjacentTerritory->getTerritoryOwner() != this) {
+                //Prevent duplicates in terrToAttack
+                if (find(terrToAttack.begin(), terrToAttack.end(), adjacentTerritory) == terrToAttack.end()) {
+                    terrToAttack.push_back(adjacentTerritory);
                 }
             }
         }
+    }
 
-	return terrToAttack;
+    return terrToAttack;
 }
 
 //Print Each Territory object's name and other info inside territoryList
 void Player::printTerritoryList(vector<Territory*> terrListToPrint) {
     //Iterate through territoryList and print name of each Territory
-     for (Territory* territory : terrListToPrint) {
+    for (Territory* territory : terrListToPrint) {
         std::cout << territory->getTerritoryName() << ", ";
     }
+}
+
+void Player::addTerriorty(Territory* Territory) {//adds a terriorty to the player terriortiesowned
+    territoryList.push_back(Territory);
+    Territory->setTerritoryOwner(this);
 }
 
 
