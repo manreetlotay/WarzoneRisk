@@ -18,6 +18,9 @@ GameEngine::GameEngine() {
 
     userInput = new string("");
     players = new int(0);
+    LogObserver* ob1 = new LogObserver();
+    Attach(ob1);
+
 
 }
 void GameEngine::loadMap(string& uInput) {
@@ -40,7 +43,7 @@ void GameEngine::loadMap(string& uInput) {
 
     }
     cout << "\nSTATE:Map Loaded" << endl;
-
+    Notify(this);
     cout << "Would you like to load map again? (yes/no)" << endl;
     cin >> uInput;
     while (flag = true)
@@ -83,6 +86,7 @@ void GameEngine::validateMap(string& uInput) {
 
     }
     cout << "\nSTATE:Map Validated" << endl;
+    Notify(this);
 }
 
 void GameEngine::addPlayer(string& uInput) {
@@ -427,3 +431,10 @@ string GameEngine::getCommand() {
 GameEngine::~GameEngine()
 {
 }
+
+string GameEngine::stringToLog()
+{
+    return "Game State: "+*userInput;
+}
+
+

@@ -5,9 +5,10 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include "LoggingObserver.h"
 using namespace std;
 
-class Order
+class Order : public Subject, public ILoggable
 {
 public :
 
@@ -32,6 +33,7 @@ public :
 
     string getType();
 
+    string stringToLog() override;
     // Stream instertion operator
     friend std :: ostream& operator<<(std::ostream& output, const Order& order);
 
@@ -112,7 +114,7 @@ private:
     std:: string effect = "effect printed from Negotiate Object";
 };
 
-class OrderList
+class OrderList : public Subject, public ILoggable
 {
 public:
 
@@ -129,6 +131,8 @@ public:
     void remove(Order* oneOrder);
     //Move position
     void move(int position, int newPosition);
+
+    string stringToLog() override;
 
     OrderList& operator=(const OrderList& orderList);
 

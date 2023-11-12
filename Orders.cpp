@@ -4,6 +4,8 @@
 Order::Order()
 {
     std::cout<<"Order default constructor called"<< endl;
+    LogObserver* ob2 = new LogObserver();
+    Attach(ob2);
 }
 
 Order::~Order()
@@ -27,6 +29,7 @@ void Order::execute()
     if (valid) {
         cout << "Executing Action" << endl;
     }
+    Notify(this);
 }
 
 void Order::setTypeID(int num)
@@ -39,6 +42,11 @@ string Order::getType()
     return vecType.at(typeID);
 }
 
+string Order::stringToLog()
+{
+    return "Order " + this->getType() + " Executed";
+}
+
 std::ostream& operator<<(std::ostream& output, const Order& order) {
     cout << "Object order"<< endl;
     if (order.valid){
@@ -49,6 +57,8 @@ std::ostream& operator<<(std::ostream& output, const Order& order) {
 
 OrderList:: OrderList(){
     std :: cout<<"Orderlist object created"<<endl;
+    LogObserver* ob3 = new LogObserver();
+    Attach(ob3);
 }
 
 OrderList :: ~OrderList(){
@@ -61,9 +71,15 @@ OrderList :: OrderList(const OrderList& exsistingOrderList){
     this-> vec_order_list = exsistingOrderList.vec_order_list;
 }
 
+string OrderList::stringToLog()
+{
+    return "Order " + vec_order_list.back()->getType() + " has been added";
+}
+
 void OrderList::set_order_list(Order* an_order)
 {
     vec_order_list.push_back(an_order); //add an order
+    Notify(this);
 }
 
 vector<Order*>* OrderList::get_order_list()
@@ -98,6 +114,7 @@ void OrderList::move(int position, int newPosition)
         cout << "\n not valid position" << endl;
     }
 }
+
 
 OrderList& OrderList ::operator=(const OrderList& orderList){
     this->vec_order_list = orderList.vec_order_list;

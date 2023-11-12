@@ -1,8 +1,10 @@
 #include <iostream>
 #include <string>
+#include "LoggingObserver.h"
+
 using namespace std;
 
-class GameEngine
+class GameEngine : public ILoggable, public Subject
 {
 private:
     /* data */
@@ -13,6 +15,7 @@ private:
 public:
     GameEngine(); //default constructor
     ~GameEngine();
+    string stringToLog() override;
     void startup();
     //void play();
     void loadMap(string&);
