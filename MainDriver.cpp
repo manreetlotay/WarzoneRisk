@@ -10,6 +10,7 @@ int main() {
    // testCards();
     //dtestLoadMaps();
     //testOrdersList();
-    testGameStates();
+    //testGameStates();
+    testMainGameLoop();
     
 }

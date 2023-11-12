@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <random>
 
 #include "Player.h"
 
@@ -9,13 +10,19 @@ class GameEngine {
 
     private:
         string* userInput;
-        int* players; //number of players
+        int* players;
 
+        Map selectedMap;
+        vector<Player*> allPlayers;
+        int numDistributedTerritories;
+        int numPlayers;
+        vector<string> playerNames;
+        vector<string> mapNames;
+        string selectedMapName;
         Deck* deck;
-        vector <Player*> playerList;
 
     public:
-        GameEngine(); //default constructor
+        GameEngine(); 
         ~GameEngine();
         void startup();
         //void play();
@@ -31,15 +38,20 @@ class GameEngine {
         void executeOrders(string&);
         bool win();
 
+
         void startupPhase();
         void mainGameLoop();
         void reinforcementPhase();
         void issueOrdersPhase();
         void executeOrdersPhase();
+        void removePlayers();
+        Player* checkWinner();
+        //For Demo
+        void setSelectedMap(const Map& map);
+        void setAllPlayers(const vector<Player*>& players);
+      
 };
 
 //free function
 void testGameStates();
 void testMainGameLoop();
-void removePlayersWithZeroTerritories();
-Player* checkForWinner();

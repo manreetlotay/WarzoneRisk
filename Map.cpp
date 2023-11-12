@@ -315,28 +315,51 @@ vector<Territory*> Map::getTerritoryList() {
 
 //Added my Manreet
 //Takes a player as a parameter and returns a list of continents owned by that player
+// vector<Continent*> Map::continentsOwnedByPlayer(Player* player) {
+//     vector<Continent*> continentsOwned;
+
+//     for (Continent* continent : continentList) {
+//         vector<Territory*> territoriesInContinent;
+
+//         // Find all territories in the current continent
+//         copy_if(territoryList.begin(), territoryList.end(), back_inserter(territoriesInContinent),
+//             [continent](Territory* territory) {
+//                 return territory->getContinent() == continent;
+//             });
+
+//         // Check if the first territory's owner is the same for all territories in the continent
+//         if (!territoriesInContinent.empty() &&
+//             all_of(territoriesInContinent.begin(), territoriesInContinent.end(),
+//                 [owner = territoriesInContinent[0]->getTerritoryOwner()](Territory* territory) {
+//                     return territory->getTerritoryOwner() == owner;
+//                 }) &&
+//             territoriesInContinent[0]->getTerritoryOwner() == player) {
+//             continentsOwned.push_back(continent);
+//         }
+//     }
+
+//     return continentsOwned;
+// }
+
 vector<Continent*> Map::continentsOwnedByPlayer(Player* player) {
     vector<Continent*> continentsOwned;
 
     for (Continent* continent : continentList) {
-        vector<Territory*> territoriesInContinent;
+        bool ownsAllTerritories = true;
 
-        // Find all territories in the current continent
-        copy_if(territoryList.begin(), territoryList.end(), back_inserter(territoriesInContinent),
-            [continent](Territory* territory) {
-                return territory->getContinent() == continent;
-            });
+        for (Territory* territory : territoryList) {
+            if (territory->getContinent() == continent && territory->getTerritoryOwner() != player) {
+                ownsAllTerritories = false;
+                break;
+            }
+        }
 
-        // Check if the first territory's owner is the same for all territories in the continent
-        if (!territoriesInContinent.empty() &&
-            all_of(territoriesInContinent.begin(), territoriesInContinent.end(),
-                [owner = territoriesInContinent[0]->getTerritoryOwner()](Territory* territory) {
-                    return territory->getTerritoryOwner() == owner;
-                }) &&
-            territoriesInContinent[0]->getTerritoryOwner() == player) {
+        if (ownsAllTerritories) {
             continentsOwned.push_back(continent);
         }
     }
 
     return continentsOwned;
 }
+
+
