@@ -1,11 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+//#include "Player.h"
 
 using namespace std;
 
 class Player;
-
 
 class Continent
 {
@@ -62,18 +62,22 @@ public:
     ~Map();
     vector<Continent*>continentList; // List points to existing continent objects
     vector<Territory*>territoryList; // List points to existing territory objects
-    Continent* findContinentByName(string name);    // Find and return Continent from continentList
-    Territory* findTerritoryByName(string name);    // Find and return Territory from territoryList
-    bool Validate();    // Validate map by checking territory and continent connections 
-                        // and 1 to many relationship continent-territory
+    Continent* findContinentByName(string name); // Find and return Continent from continentList
+    Territory* findTerritoryByName(string name);
+    void Validate();
     void DFS(Territory*,vector<Territory*>&);
-    void DFS1(Territory*, vector<Territory*>&, vector<Continent*>&);    //Search through DFS to check continent connections
-    bool checkTerritoryConnections();   // Search through DFS to check territory connections
-    bool checkContinentConnections();   //Search through DFS to check continent connections
+    void DFS1(Territory*, vector<Territory*>&, vector<Continent*>&);
+    bool checkTerritoryConnections();
+    bool checkContinentConnections();
     bool checkTerritoryTo1Contient();
+    void mapLoader(string);
+    void showTerritories();
+    void showContinents();
+    void getADJTerritories(string);
 
 };
 
 //free function
 void testLoadMaps();
   
+

@@ -4,15 +4,18 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 */
 
 #include "Player.h"
+
 #include <iostream>
 
 // default constructor
-Player::Player() : handOfCards(nullptr), orderList(nullptr), territoryList(vector<Territory*>()) {} //, playerName("NoName"){}
-
+Player::Player() : name(""), handOfCards(nullptr), orderList(nullptr), territoryList(vector<Territory*>()) {
+    
+}
 
 //Parameterized Constructor
-Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList) //, string playerName)
-    : handOfCards(handOfCards), orderList(orderList), territoryList(territoryList) {}//, playerName(playerName) {}
+Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList)
+    : handOfCards(handOfCards), orderList(orderList), territoryList(territoryList) {
+}
 
  //destructor
  Player::~Player() {
@@ -34,31 +37,20 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
  //copy constructor
  Player::Player(const Player& ogPlayer) {
 
-    //copying handOfCards
-    if(ogPlayer.handOfCards != nullptr) {   
+    //if ogPlayer was instantiated using the parameterized constructor
+     if ((ogPlayer.handOfCards != nullptr) && (ogPlayer.orderList != nullptr) && (!ogPlayer.territoryList.empty())) {
         this->handOfCards = new Hand(*(ogPlayer.handOfCards));
-    }
-    else {
-        this->handOfCards = nullptr;
-    }
+        this->orderList = new OrderList(*(ogPlayer.orderList));
 
-    //copying orderList
-    if(ogPlayer.orderList != nullptr) {
-        this->orderList = new OrderList(*(ogPlayer.orderList));  
-    }
-    else {
-        this->orderList = nullptr;
-    }
-
-    //copying territoryList
-    if(!ogPlayer.territoryList.empty()) {
         //deep copy each Territory from one list to the other
          for (Territory* territory: ogPlayer.territoryList) {
             this->territoryList.push_back(new Territory(*territory));
         }
-    }
-    else {
-        //instantiate new territoryList
+
+    //if ogPlayer was instantiated using the default constructor
+    } else {
+        this->handOfCards = nullptr;
+        this->orderList = nullptr;
         territoryList = vector<Territory*>();
     }
  }
@@ -71,32 +63,23 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
         return *this; 
     }
 
-    //copying handOfCards
-    if(player.handOfCards != nullptr) {   
+    //clear memory
+     delete handOfCards; 
+     delete orderList; 
+
+    //if player was instantiated using the parameterized constructor
+    if ((player.handOfCards != nullptr) && (player.orderList != nullptr) && (!player.territoryList.empty())) {
         this->handOfCards = new Hand(*(player.handOfCards));
-    }
-    else {
-        this->handOfCards = nullptr;
-    }
+        this->orderList = new OrderList(*(player.orderList));
 
-    //copying orderList
-    if(player.orderList != nullptr) {
-        this->orderList = new OrderList(*(player.orderList));  
-    }
-    else {
-        this->orderList = nullptr;
-    }
-
-    //copying territoryList
-    if(!player.territoryList.empty()) {
         //deep copy each Territory from one list to the other
-         for (Territory* territory: player.territoryList) {
-            this->territoryList.push_back(new Territory(*territory));
-        }
+        for (Territory* territory: player.territoryList) {
+        this->territoryList.push_back(new Territory(*territory));
     }
-    else {
-        //instantiate new territoryList
-        territoryList = vector<Territory*>();
+    //if player was instantiated using the default constructor
+    } else {
+        this->handOfCards = nullptr;
+        this->orderList = nullptr;
     }
 
     return *this;
@@ -108,42 +91,31 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
     Hand* handOfCards = player.getHandOfCards();
     OrderList* orderList = player.getOrderList();
     vector<Territory*> territoryList = player.getTerritoryList();
-    //string playerName = player.getPlayerName();
 
-    output << "Player's Information: " << std::endl;
-    output << "\n";
-
-    //print player's handOfCards message if its empty
-    if (handOfCards == nullptr) {
+    //If player was instantiated using default constructor
+    if ((handOfCards == nullptr) && (orderList == nullptr) && (territoryList.empty())) {
         output << "Player's Hand of Cards is empty" << std::endl;
-    }
-    else {
+        output << "Player's List of Orders is empty" << std::endl;
+        output << "Player Does Not Own Any Territories" << std::endl;
+
+    //If player was instantiated using parameterized constructor
+    } else {
         //Print player's hand of cards
         output << "Player's Hand of Cards: " << std::endl;
             // Iterate through the cards in the player's hand and print them
             for (Card* card : handOfCards->hand) {
                 card->Play();
             }
-    }
 
-    //print player's orderList message if its empty
-    if (orderList == nullptr) {
-        output << "Player's List of Orders is empty" << std::endl;
-    }
-    else {
+        output << "\n";
+
         //print player's list of orders
         output << "Player's List of Orders: " << std::endl;
             // Iterate through the order list and print each order's type
             for (int i = 0; i < orderList->get_order_list()->size(); i++) {
                 output << "  " << orderList->get_order_list()->at(i)->getType() << std::endl;
             }
-    }
 
-    //print player's territoryList message if its empty
-    if(territoryList.empty()) {
-        output << "Player Does Not Own Any Territories" << std::endl;
-    }
-    else {
         //print player's list of territories
         output << "Player's List of Territories:" << std::endl;
             //Iterate through territoryList and print name of each Territory object
@@ -169,11 +141,15 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
     return territoryList;
  };
 
-//  string Player::getPlayerName() {
-//     return playerName;
-//  }
+ string Player:: getName() {
+     return this->name;
+ }
 
  //setters
+ void Player::setName(string name) {
+     this->name = name;
+ }
+
  void Player::setHand(Hand* newHandOfCards) {
     handOfCards = newHandOfCards;
 }
@@ -181,10 +157,6 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
 void Player::setTerritoryList(vector<Territory*> newTerritoryList) {
     territoryList = newTerritoryList;
 }
-
-// void Player::setPlayerName(string newPlayerName) {
-//     playerName = newPlayerName;
-// }
 
 //create Order object and add it to player's list of orders
 void Player::issueOrder(Order* order) {
@@ -238,6 +210,7 @@ void Player::printTerritoryList(vector<Territory*> terrListToPrint) {
         std::cout << territory->getTerritoryName() << std::endl;
     }
 }
+
 
 
 

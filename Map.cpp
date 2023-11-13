@@ -1,15 +1,11 @@
 //#include <iostream>
 #include "Map.h"
+#include <fstream>
+#include <string.h>
+#include <sstream>
+#include <iomanip>
 using namespace std;
 
-//  Player:: Player(/* args */)
-// {
-//     //playerName = "";                            ////////////////////////////////////////////////////UNCOMMENT
-// }
-// Player:: ~Player()
-// {
-
-// }
 
 Continent::Continent()
 {
@@ -165,4 +161,139 @@ bool Map::checkTerritoryTo1Contient(){
         }
     }
     return true;
+}
+
+
+
+void Map::Validate() {
+    bool a = checkContinentConnections() && checkTerritoryConnections() && checkTerritoryTo1Contient();
+    if (a == true) {
+        cout << "\nMap created and validated" << endl;
+    }
+    else {
+        cout << "Map not valid" << endl;
+    }
+}
+
+void Map::mapLoader(string mapname)
+{
+    cout << "Creating Map: "<< mapname << endl;
+
+    fstream file;
+    file.open(mapname);
+
+    if (!file.is_open()) {
+        cerr << "Failed to open file :(" << endl;
+
+    }
+    else {
+        string line;
+        while (getline(file, line)) {
+            if (line == "[Continents]") {
+                getline(file, line);
+                while (line != "") {
+                    if (line != "") {
+                        size_t delimPos = line.find("=");
+                        string name = line.substr(0, delimPos);
+                        int bonus = stoi(line.substr(delimPos + 1, line.length()));
+                        Continent* c = new Continent(name, bonus);
+                        this->continentList.push_back(c);
+                        getline(file, line);
+                    }
+                }
+
+            }
+            if (line == "[Territories]") {
+                getline(file, line);
+
+                string name;
+                while (!file.eof())
+                {
+                    bool flag = false;
+                    while (line == "") {
+                        getline(file, line);
+                        flag = file.eof();
+                        if (flag == true) {
+                            break;
+                        }
+                    }
+                    if (flag == false) {
+                        stringstream ss(line);
+                        vector<string> tokens;
+                        string token;
+                        while (getline(ss, token, ','))
+                        {
+                            tokens.push_back(token);
+                        }
+
+                        string nameTerritory = tokens[0];
+                        name = tokens[3];
+                        Continent* c;
+                        Territory* t;
+                        c = this->findContinentByName(name);
+
+                        if (this->findTerritoryByName(nameTerritory) == nullptr)
+                        {
+                            t = new Territory(tokens[0], c);
+                            this->territoryList.push_back(t);
+                        }
+                        else {
+                            t = this->findTerritoryByName(nameTerritory);
+                            t->setContinent(c);
+                        }
+
+                        // Check if adjacent territory exist
+                        for (int i = 4; i < tokens.size(); i++) {
+                            name = tokens[i];
+                            auto it = find_if(this->territoryList.begin(), this->territoryList.end(), [&name](Territory* cont) {return cont->getTerritoryName() == name; });
+                            if (it == this->territoryList.end()) {
+                                Territory* newTerritory = new Territory(name);
+                                this->territoryList.push_back(newTerritory);
+                                t->adjencyList.push_back(newTerritory);
+                            }
+                            else {
+                                t->adjencyList.push_back(*it);
+                            }
+                        }
+                        getline(file, line);
+                    }
+                }
+            }
+        }
+    }
+    file.close();
+}
+
+void Map::showTerritories()
+{
+    cout << "Name" << setw(20) << "Continent"<< setw(20) << "Adjacent Territories"<<endl;
+    for (int i = 0; i < territoryList.size(); i++) {
+        cout << setw(20) << territoryList[i]->getTerritoryName() <<setw(20) << left<<territoryList[i]->getContinent()->getContinentName();
+        for (int j = 0; j < territoryList[i]->adjencyList.size(); j++) {
+            cout << territoryList[i]->adjencyList[j]->getTerritoryName() << " ";
+        }
+        cout<<endl;
+    }
+    cout << endl;
+}
+
+void Map::showContinents()
+{
+    cout << "Continent List: ";
+    for (int i = 0; i < continentList.size(); i++) {
+        cout << continentList[i]->getContinentName()<< " ";
+    }
+    cout << endl;
+}
+
+
+void Map::getADJTerritories(string territoryName)
+{
+    Territory *t;
+    t = findTerritoryByName(territoryName); 
+    cout << "Adjacency List of " + territoryName + ":";
+    for (int i = 0; i < t->adjencyList.size(); i++) {
+        cout << " " + t->adjencyList[i]->getTerritoryName() + ",";
+    }
+    cout << endl;
 }

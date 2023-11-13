@@ -10,19 +10,20 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 #include "Orders.h"
 #include "Map.h"
 
+
 class Player {
 
     private:  
         Hand* handOfCards;
         OrderList* orderList;
         vector<Territory*> territoryList;
-        //string playerName;
+        string name;
 
     public:
         //constructor and destructor
         Player();
         ~Player();
-        Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList);//, string playerName);
+        Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList);
         
         //copy constructor
         Player(const Player& ogPlayer);
@@ -42,12 +43,12 @@ class Player {
         Hand* getHandOfCards();
         OrderList* getOrderList();
         vector<Territory*> getTerritoryList();
-        //string getPlayerName();
+        string getName();
 
         //setters
         void setHand(Hand* newHandOfCards);
         void setTerritoryList(vector<Territory*> newTerritoryList);
-       // void setPlayerName(string newPlayerName);
+        void setName(string);
 
         //Other
         void printTerritoryList(vector<Territory*> terrListToPrint);
