@@ -15,15 +15,26 @@ win
 play
 */
 
+
 //Initialize variables
-        Map selectedMap;
-        vector<Player*> allPlayers;
-        int numPlayers;
-        vector<string> playerNames;
-        vector<string> mapNames = { "maps/Canada.map", "maps/Caribbean.map" };
-        string selectedMapName;
+        // Map selectedMap;
+        // vector<Player*> allPlayers;
+        // int numDistributedTerritories = 0;
+        // int numPlayers;
+        // vector<string> playerNames;
+        // vector<string> mapNames = { "maps/Canada.map", "maps/Caribbean.map" };
+        // string selectedMapName;
 
 GameEngine::GameEngine() {
+    
+    // userInput = new string("");
+    // players = new int(0);
+    numDistributedTerritories = 0;
+    numPlayers = 0;
+    selectedMapName = "";
+    mapNames = { "maps/Canada.map", "maps/Caribbean.map" };
+    selectedMap = Map();
+
 
     userInput = new string("");
     players = new int(0);
@@ -436,18 +447,14 @@ string GameEngine::getCommand() {
     return *userInput;
 
 }
-//void GameEngine::verifyCommand() {
-//	const vector<string> commandList = { "loadmap","validatemap","addplayer","assigncountries","issueorder","endexecorders","execorder","win","play" };
-//    
-//    
-//}
+
 
 void GameEngine::startupPhase() {
 
         //Welcome the user to Warzone
         cout << "===================================================================================================================" << endl;
-        cout << "| WELCOME TO THE WORLD OF WARZONE, where strategy and wit reign supreme!" << endl;
-        cout << "| Get ready to conquer your way to victory on this interconnected battlefield, one move at a time!" << endl;
+        cout << "| WELCOME TO THE WORLD OF WARZONE, where strategy and wit reign supreme!                                           |" << endl;
+        cout << "| Get ready to conquer your way to victory on this interconnected battlefield, one move at a time!                 |" << endl;
         cout << "===================================================================================================================\n" << endl;
         
         //Let the user choose a map and validate it
@@ -517,8 +524,12 @@ void GameEngine::startupPhase() {
 
         cout << "\nWARRIORS, YOU HAVE ALL BEEN GRANTED YOUR FAIR SHARE OF TERRITORIES. SURVEY THE LANDS UNDER YOUR DOMINION AND THOSE THAT STAND AS THE REALMS OF YOUR FOES.\n" << endl;
 
-        // Assign territories to players 
+        //Assign territories to players 
         vector<Territory*> territories = selectedMap.getTerritoryList();
+
+        //Shuffle the territories randomly
+        std::random_device rd;
+        std::mt19937 g(rd());
         random_shuffle(territories.begin(), territories.end());
 
         //Set armies on territory to 0 initially
@@ -534,6 +545,7 @@ void GameEngine::startupPhase() {
             //Set the owner for each territory
             for (Territory* territory : playerTerritories) {
                 territory->setTerritoryOwner(allPlayers[i]);
+                numDistributedTerritories++;
             }
 
             allPlayers[i]->setTerritoryList(playerTerritories);
@@ -612,56 +624,16 @@ void GameEngine::startupPhase() {
     
 }
 
-void GameEngine::mainGameLoop() {
-    // void mainGameLoop() {
-
-//     // Variable to keep track of the current turn
-//     int turnCounter = 0;
-
-//     // Variable to limit the maximum number of game loops
-//     int maxGameLoops = 50;
-
-//     // Main game loop
-//     while (true) {
-//         // Check if a player has won by owning all territories
-//         Player* winningPlayer = checkForWin(allPlayers);
-//         if (winningPlayer != nullptr) {
-//             cout << "Congratulations, " << winningPlayer->getPlayerID() << " has won the game!" << endl;
-//             break;
-//         }
-
-//         // Check for players with no territories and remove them
-//         removePlayersWithNoTerritories(allPlayers);
-
-//         // Check if the maximum number of game loops is reached
-//         if (turnCounter >= maxGameLoops) {
-//             cout << "The game has ended in a draw." << endl;
-//             break;
-//         }
-
-//         // Get the current player for the current turn
-//         Player* currentPlayer = allPlayers[turnCounter % numPlayers];
-
-//         // Subphase 1: Reinforcement Phase
-//         reinforcementPhase(currentPlayer);
-
-//         // Subphase 2: Issue Orders Phase
-//         issueOrdersPhase(currentPlayer);
-
-//         // Subphase 3: Execute Orders Phase
-//         executeOrdersPhase(currentPlayer);
-
-//         // Increment the turn counter
-//         turnCounter++;
-//     }
-
-// }
-    
-
-   
-}
-
 void GameEngine::reinforcementPhase() {
+
+            cout << "BEFORE\n" << endl;
+            for (Player* player: allPlayers) {
+
+                // if(player->getPlayerID() == "john" || player->getPlayerID() == "mike") 
+                cout << player->getPlayerID() << "'s Reinforcement Pool: " << player->getReinforcementPool() << endl;
+                
+            }
+
 
             cout << "ADDITIONAL ARMY UNITS ARE ON THE WAY, ENHANCING YOUR FORCES FOR THE BATTLES AHEAD. GET READY!" << endl;
 
@@ -683,31 +655,178 @@ void GameEngine::reinforcementPhase() {
 
                 //cout << player->getPlayerID() << ", this is your reinforcementPool" << player->getReinforcementPool() << endl;
             }
+
+            cout << "AFTER\n" << endl;
+            for (Player* player: allPlayers) {
+
+                // if(player->getPlayerID() == "john" || player->getPlayerID() == "mike") 
+                cout << player->getPlayerID() << "'s Reinforcement Pool: " << player->getReinforcementPool() << endl;
+                
+            }
     
 }
 
 
 void GameEngine::issueOrdersPhase() {
 
-    cout << "WARRIORS, IT'S TIME TO ISSUE YOUR COMMANDS, ONE BY ONE\n" << endl;
-    cout << "  O" << endl;
-    cout << " /|\\" << endl;
-    cout << " / \\" << endl;
-    cout << "/   \\" << endl;
-    cout << "\n";
+    cout << "\nIT'S TIME TO ISSUE YOUR COMMANDS\n" << endl;
 
     for (Player* player : allPlayers) {
-        
-        cout << player->getPlayerID() << ", IT IS YOUR TURN.......................................\n" << endl;
+
+        cout << "  O" << endl;
+        cout << " /|\\" << endl;
+        cout << " / \\" << endl;
+        cout << "/   \\" << endl;
+        cout << "___________________________________________________________________________________" << endl;
+        cout << player->getPlayerID() << ", IT IS YOUR TURN.....\n" << endl;
         player->issueOrder();
     }
 
 }
 
 void GameEngine::executeOrdersPhase() {
-    
+
+    cout << "\nExecution phase\n" << endl; 
+    // for(Player* player: allPlayers) {
+    //     for(Order* order: player->getOrderList()) {
+    //         order->execute();
+    //     }
+    // } 
+
 }
 
+
+Player* GameEngine::checkWinner() {
+    //Iterate through all players and check if any player owns all territories
+    for (Player* player : allPlayers) {
+        if (player->getTerritoryList().size() == numDistributedTerritories) {
+            return player;
+        }
+    }
+
+    return nullptr; //No winner yet
+}
+
+void GameEngine::removePlayers() {
+    vector<Player*> survivingPlayers;
+    
+    for (Player* player : allPlayers) {
+        if (!player->getTerritoryList().empty()) {
+            survivingPlayers.push_back(player);
+        } else {
+            cout << "OOPS! PLAYER " << player->getPlayerID() << " has been eliminated.................................................................................................................................." << endl;
+        }
+    }
+
+    allPlayers = survivingPlayers; // Update the player list
+}
+
+
+// void GameEngine::mainGameLoop() {
+
+//     int maxRounds = 3;
+//     int currentRound = 1;
+//     Player* winner = nullptr;
+
+//     while (currentRound < maxRounds) {
+//         reinforcementPhase();  // Implement this function
+//         issueOrdersPhase();    // Implement this function
+//         executeOrdersPhase(); // Implement this function
+
+//         // Check for a winner
+//         winner = checkWinner();
+//         if (winner) {
+//             cout << "Player " << winner->getPlayerID() << " wins!" << endl;
+//             break;
+//         }
+
+//         // if (currentRound == 1) {
+//         //      int randomIndex = rand() % allPlayers.size();  // Randomly choose a player
+//         //     Player* playerToRemove = allPlayers[randomIndex];
+
+//         //     //Remove all the player's territories 
+//         //     cout << "Removing player's territories" << endl;
+//         //     playerToRemove->setTerritoryList(vector<Territory*>());
+//         // }
+
+//         //Check for players with zero territories and remove them
+//         removePlayers();
+
+//         currentRound++;
+//     }
+
+//     if (!winner) {
+//         cout << "The game ends in a tie. No winner." << endl;
+//     } 
+
+   
+// }
+
+
+void GameEngine::mainGameLoop() {
+
+    int maxRounds = 5;
+    int currentRound = 1; // Start from round 1
+    Player* winner = nullptr;
+
+    while (currentRound <= maxRounds) {
+        reinforcementPhase();  // Implement this function
+        issueOrdersPhase();    // Implement this function
+        executeOrdersPhase();  // Implement this function
+
+        // Check for a winner
+        winner = checkWinner();
+        if (winner) {
+            cout << "PLAYER " << winner->getPlayerID() << " wins!" << endl;
+            break;
+        }
+
+        // Manually remove a player's territories in round 2
+        if (currentRound == 2) {
+            if (!allPlayers.empty()) {
+                int randomIndex = rand() % allPlayers.size();  // Randomly choose a player
+                Player* playerToRemove = allPlayers[randomIndex];
+
+                // Remove all the player's territories
+                cout << "Removing territories from Player " << playerToRemove->getPlayerID() << endl;
+                playerToRemove->setTerritoryList(vector<Territory*>());
+
+                // Check for players with zero territories and remove them
+                removePlayers();
+            }
+        }
+
+        // // After removing players, check if there are still players left
+        // if (allPlayers.size() < 2) {
+        //     // If there are less than 2 players, the game cannot continue
+        //     break;
+        // }
+
+        currentRound++;
+    }
+
+    if (!winner) {
+        cout << "The game ends in a tie. No winner." << endl;
+    }
+}
+
+
+
+
+
+void GameEngine::setSelectedMap(const Map& map) {
+    selectedMap = map;
+}
+
+// Implementation of setAllPlayers
+void GameEngine::setAllPlayers(const vector<Player*>& players) {
+    allPlayers = players;
+}
+
+ void GameEngine::initializeGame(Map& map, vector<Player*>& players) {
+    selectedMap = map;
+    allPlayers = players;
+}
 string GameEngine::stringToLog()
 {
     return "Game State: "+*userInput;
