@@ -7,6 +7,7 @@
 using namespace std;
 class Player;
 class Territory;
+class Map;
 
 class Order{
 public:
@@ -17,6 +18,8 @@ public:
     virtual bool validate() const = 0;
     int getPriority() const;
     string getType();
+    static std::vector<Player*> getDiplomaticRelations();
+    static void addDiplomaticRelation(Player* player);
 
 protected:
     Order();
@@ -32,6 +35,8 @@ private:
     vector<string> vecType = { "deploy", "advance", "bomb", "blockade", "airlift", "negotiate" };
     int typeID;
     void setTypeID(int num);
+    static std::vector<Player*> diplomaticRelations;
+    Map *gameMap;
 };
 
 class OrderList

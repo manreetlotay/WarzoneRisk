@@ -9,32 +9,32 @@
 #include <iterator>
 #include <math.h>
 
-namespace
+
+
+// Custom comparator to sort Orders by priority
+bool compareOrders(Order* order1, Order* order2)
 {
-    // Custom comparator to sort Orders by priority
-    bool compareOrders(Order* order1, Order* order2)
-    {
-        return order1->getPriority() < order2->getPriority();
-    }
-
-    // Helper function to check whether a territory can be attacked by a specific player.
-    // Returns `true` if the attacker already owns the target territory
-    // OR
-    // if there is no diplomacy between the attacker and the owner of the target.
-    bool canAttack(Player* attacker, Territory* target)
-    {
-        Player* ownerOfTarget = target->getTerritoryOwner(); ;
-        vector<Player*> diplomaticRelations = attacker->getDiplomaticRelations();
-        bool diplomacyWithOwnerOfTarget = find(diplomaticRelations.begin(), diplomaticRelations.end(), ownerOfTarget) != diplomaticRelations.end();
-
-        if (diplomacyWithOwnerOfTarget)
-        {
-            cout << attacker->getPlayerID() << " and " << ownerOfTarget << " cannot attack each other for the rest of this turn. ";
-        }
-
-        return attacker == ownerOfTarget || !diplomacyWithOwnerOfTarget;
-    }
+    return order1->getPriority() < order2->getPriority();
 }
+
+// Helper function to check whether a territory can be attacked by a specific player.
+// Returns `true` if the attacker already owns the target territory
+// OR
+// if there is no diplomacy between the attacker and the owner of the target.
+bool canAttack(Player* attacker, Territory* target)
+{
+    Player* ownerOfTarget = target->getTerritoryOwner();
+    std::vector<Player*> diplomaticRelations = Order::getDiplomaticRelations();
+    bool diplomacyWithOwnerOfTarget = find(diplomaticRelations.begin(), diplomaticRelations.end(), ownerOfTarget) != diplomaticRelations.end();
+
+    if (diplomacyWithOwnerOfTarget)
+    {
+        cout << attacker->getPlayerID() << " and " << ownerOfTarget << " cannot attack each other for the rest of this turn. ";
+    }
+
+    return attacker == ownerOfTarget || !diplomacyWithOwnerOfTarget;
+}
+
 
 
 Order::Order(): issuePlayer(nullptr), priority(4) {}
@@ -145,12 +145,13 @@ OrderList& OrderList ::operator=(const OrderList& orderList){
     return *this;
 }
 
-std :: ostream& operator<<(std::ostream& output, const OrderList &list){
-    std:: vector<Order*> temp = list.vec_order_list;
-    for (int i = 0; !temp.empty(); i++){
+std::ostream& operator<<(std::ostream& output, const OrderList &list) {
+    std::vector<Order*> temp = list.vec_order_list;
+    for (int i = 0; !temp.empty(); i++) {
         Order* obj = temp.front();
-        cout<<to_string(i)<< endl;
-        cout<<*obj<<endl;
+        cout << to_string(i) << endl;
+        cout << *obj << endl;
+        temp.erase(temp.begin()); // Remove the printed order from the temp vector
     }
     return output;
 }
@@ -311,6 +312,7 @@ void Advance::execute_()
             //defender->getTerritoryList().erase(defender->getTerritoryList().begin()+pos);
             target->setNumOfArmies(target->getNumOfArmies()+survivingAttackers);
             cout << "Successful attack on " << target->getTerritoryName() << ". " << survivingAttackers << " armies now occupy this territory." << endl;
+
         }
     }
     else
@@ -547,12 +549,22 @@ bool Negotiate::validate() const
 // Executes the NegotiateOrder.
 void Negotiate::execute_()
 {
-    issuePlayer->addDiplomaticRelation(targetPlayer);
-    targetPlayer->addDiplomaticRelation(issuePlayer);
+    addDiplomaticRelation(issuePlayer);
+    addDiplomaticRelation(targetPlayer);
     cout << "Negotiated diplomacy between " << issuePlayer->getPlayerID()<< " and " << targetPlayer->getPlayerID() << "." << endl;
 }
 
 Negotiate :: ~Negotiate() = default;
+
+std::vector<Player*> Order::diplomaticRelations;
+
+std::vector<Player*> Order::getDiplomaticRelations() {
+    return diplomaticRelations;
+}
+
+void Order::addDiplomaticRelation(Player* player) {
+    diplomaticRelations.push_back(player);
+}
 
 
 

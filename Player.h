@@ -49,9 +49,6 @@ public:
     string getPlayerID();
     int getReinforcementPool();
 
-    std::vector<Player*> getDiplomaticRelations() const;
-    void addDiplomaticRelation(Player* player);
-
     string getTerritoriesString() const {
         string result = "Territories owned by player: ";
         for (const auto& territory : territoryList) {
