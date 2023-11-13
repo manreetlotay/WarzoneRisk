@@ -43,3 +43,6 @@ class LogObserver:public Observer
 		void Update(ILoggable*);
 
 };
+
+// free function
+void testLoggingObserver();
