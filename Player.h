@@ -9,46 +9,68 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 #include "Cards.h"
 #include "Orders.h"
 #include "Map.h"
+#include <iomanip>
+
 
 class Player {
 
-    private:  
-        Hand* handOfCards;
-        OrderList* orderList;
-        vector<Territory*> territoryList;
+private:
+    Hand* handOfCards;
+    OrderList* orderList;
+    vector<Territory*> territoryList;
+    string playerID;
+    int reinforcementPool;
+    std::vector<Player*> diplomaticRelations;
 
-    public:
-        //constructor and destructor
-        Player();
-        ~Player();
-        Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList);
-        
-        //copy constructor
-        Player(const Player& ogPlayer);
+public:
+    //constructor and destructor
+    Player();
+    ~Player();
+    Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> territoryList, string playerID);
 
-        //Assignment operator overloader
-        Player& operator = (const Player& player);
+    //copy constructor
+    Player(const Player& ogPlayer);
 
-        //Stream insertion operator overloader
-        friend std::ostream &operator << (std::ostream &output, Player &player);
+    //Assignment operator overloader
+    Player& operator = (const Player& player);
 
-        // required methods of a Player
-        void issueOrder(Order* order);
-        vector<Territory*> toDefend();
-        vector<Territory*> toAttack();
+    //Stream insertion operator overloader
+    friend std::ostream &operator << (std::ostream &output, Player &player);
 
-        //getters
-        Hand* getHandOfCards();
-        OrderList* getOrderList();
-        vector<Territory*> getTerritoryList();
+    // required methods of a Player
+    void issueOrder();
+    vector<Territory*> toDefend();
+    vector<Territory*> toAttack();
 
-        //setters
-        void setHand(Hand* newHandOfCards);
-        void setTerritoryList(vector<Territory*> newTerritoryList);
+    //getters
+    Hand* getHandOfCards();
+    OrderList* getOrderList();
+    vector<Territory*> getTerritoryList();
+    string getPlayerID();
+    int getReinforcementPool();
 
-        //Other
-        void printTerritoryList(vector<Territory*> terrListToPrint);
+    string getTerritoriesString() const {
+        string result = "Territories owned by player: ";
+        for (const auto& territory : territoryList) {
+            result += territory->getTerritoryName() + " ";
+        }
+        return result;
+    }
+    //setters
+    void setHand(Hand* newHandOfCards);
+    void setTerritoryList(vector<Territory*> newTerritoryList);
+    void setPlayerID(string newPlayerID);
+    void setReinforcementPool(int newReinforcementPool);
+
+    //Other
+    void printTerritoryList(vector<Territory*> terrListToPrint);
+    void addReinforcements(int armyUnits);
+    void removeReinforcements(int armyUnits);
+    void addOrderToOrderList(Order* order);
+    void addTerriorty(Territory*);
 };
 
 //free function declaration
 void testPlayers();
+
+

@@ -5,10 +5,14 @@ using namespace std;
 
 void testGameStates() {
 
-    GameEngine engineObj;
-    engineObj.startup();
+    //GameEngine engineObj;
+    //engineObj.startup();
     //engineObj.play();
 
-    system("pause");
+    //system("pause");
 
+    GameEngine game;
+    game.startupPhase();
+    game.reinforcementPhase();
+    game.issueOrdersPhase();
 }

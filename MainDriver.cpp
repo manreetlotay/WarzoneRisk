@@ -1,5 +1,5 @@
 #include <ostream>
-#include "Player.h"
+//#include "Player.h"
 #include "GameEngine.h"
 #include "CommandProcessing.h"
 #include "LoggingObserver.h"
@@ -14,5 +14,6 @@ int main() {
     //testGameStates();
     //testCommandProcessor();
     testLoggingObserver();
+    testGameStates();
     
 }

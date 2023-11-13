@@ -94,7 +94,9 @@ std::ostream& operator<<(std::ostream& stream, const Card& card)
 void Card::Play()
 {
     std::cout << "Card Played : " << cardvalue << " | Action : " << cardaction << std::endl;
+
 };
+
 
 ///////////////////////////////////////////////////////////
 

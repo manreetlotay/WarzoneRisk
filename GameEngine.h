@@ -1,5 +1,8 @@
 #include <iostream>
 #include <string>
+
+#include "Player.h"
+
 #include "LoggingObserver.h"
 
 using namespace std;
@@ -11,6 +14,8 @@ private:
     string* userInput;
     int* players; //number of players
 
+        Deck* deck;
+        vector <Player*> playerList;
 
 public:
     GameEngine(); //default constructor
@@ -30,9 +35,13 @@ public:
     void executeOrders(string&);
     bool win();
 
-
-
+        void startupPhase();
+        void mainGameLoop();
+        void reinforcementPhase();
+        void issueOrdersPhase();
+        void executeOrdersPhase();
 };
 
 //free function
 void testGameStates();
+void testMainGameLoop();

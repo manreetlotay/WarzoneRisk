@@ -266,14 +266,23 @@ void Map::mapLoader(string mapname)
 
 void Map::showTerritories()
 {
-    cout << "Name" << setw(20) << "Continent"<< setw(20) << "Adjacent Territories"<<endl;
+   cout << left << setw(25) << "Territory Name" << setw(25) << "Continent" << "Adjacent Territories" << endl;
+   cout << "______________________________________________________________________________________________________________" << endl;
+    
     for (int i = 0; i < territoryList.size(); i++) {
-        cout << setw(20) << territoryList[i]->getTerritoryName() <<setw(20) << left<<territoryList[i]->getContinent()->getContinentName();
+        cout << setw(25) << left << territoryList[i]->getTerritoryName();
+        cout << setw(25) << left << territoryList[i]->getContinent()->getContinentName();
+        
         for (int j = 0; j < territoryList[i]->adjencyList.size(); j++) {
-            cout << territoryList[i]->adjencyList[j]->getTerritoryName() << " ";
+            cout << territoryList[i]->adjencyList[j]->getTerritoryName();
+            if (j < territoryList[i]->adjencyList.size() - 1) {
+                cout << ", ";
+            }
         }
-        cout<<endl;
+        
+        cout << endl;
     }
+    
     cout << endl;
 }
 
@@ -298,12 +307,43 @@ void Map::getADJTerritories(string territoryName)
     cout << endl;
 }
 
+vector<Territory*> Map::getTerritoryList() {
+    return territoryList;
+}
+
+
+
+//Added my Manreet
+//Takes a player as a parameter and returns a list of continents owned by that player
+vector<Continent*> Map::continentsOwnedByPlayer(Player* player) {
+    vector<Continent*> continentsOwned;
+
+    for (Continent* continent : continentList) {
+        vector<Territory*> territoriesInContinent;
+
+        // Find all territories in the current continent
+        copy_if(territoryList.begin(), territoryList.end(), back_inserter(territoriesInContinent),
+            [continent](Territory* territory) {
+                return territory->getContinent() == continent;
+            });
+
+        // Check if the first territory's owner is the same for all territories in the continent
+        if (!territoriesInContinent.empty() &&
+            all_of(territoriesInContinent.begin(), territoriesInContinent.end(),
+                [owner = territoriesInContinent[0]->getTerritoryOwner()](Territory* territory) {
+                    return territory->getTerritoryOwner() == owner;
+                }) &&
+            territoriesInContinent[0]->getTerritoryOwner() == player) {
+            continentsOwned.push_back(continent);
+        }
+    }
+
+    return continentsOwned;
+}
 bool Map::isADJ(string name1, string name2)
-{   
+{
     Territory* t1 = findTerritoryByName(name1);
     Territory* t2 = findTerritoryByName(name2);
     auto it = find_if(t1->adjencyList.begin(), t1->adjencyList.end(), [&name2](Territory* cont) {return cont->getTerritoryName() == name2; });
     return (it != t1->adjencyList.end()) ? true : false;
 }
-
-
