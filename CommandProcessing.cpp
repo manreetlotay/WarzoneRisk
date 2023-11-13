@@ -76,8 +76,7 @@ std::string Command::getCmd() { return cmd; };
 std::string Command::getFlags() { return flags; };
 std::string Command::getFn()  { return fn; };
 std::string Command::getGs()  { return gamestate; };
-std::string Command::getEffect() { return effect; }
-
+std::string Command::getEffect() { return effect; };
 
 ///////////////////////////////////////////////////////////////
 
