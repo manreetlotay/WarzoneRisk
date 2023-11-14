@@ -3,8 +3,6 @@
 //
 
 #include "Orders.h"
-#include "Map.h"
-#include "Player.h"
 #include <algorithm>
 #include <iterator>
 #include <math.h>
@@ -106,7 +104,8 @@ OrderList :: OrderList(const OrderList& exsistingOrderList){
 
 string OrderList::stringToLog()
 {
-    return "Order " + vec_order_list.back()->getType() + " has been added";
+    string a = vec_order_list.back()->getType();
+    return "Order " + a + " has been added";
 }
 
 void OrderList::set_order_list(Order* an_order)
@@ -167,9 +166,10 @@ std::ostream& operator<<(std::ostream& output, const OrderList &list) {
 
 void OrderList::addOrder(Order *order) {
     vec_order_list.push_back(order);
+    Notify(this);
 }
 
-Deploy::Deploy() : Order(nullptr, 1), numberOfArmy(0), target(nullptr) {}
+Deploy::Deploy() : Order(nullptr, 1), numberOfArmy(0), target(nullptr) { this->typeID = 0; } // Check the typeID for Observer
 
 Deploy::Deploy(Player* issuer, int numberOfArmies, Territory* destination) : Order(issuer, 1), numberOfArmy(numberOfArmies), target(destination) {}
 
@@ -224,11 +224,19 @@ void Deploy::execute_()
 {
     target->setNumOfArmies(numberOfArmy);
     cout << "Deployed " << numberOfArmy << " armies to " << target->getTerritoryName() << "." << endl;
+    Notify(this);
 }
 
 Deploy::~Deploy()= default;
 
-Advance::Advance() : Order(), numberOfArmy(0), source(nullptr), target(nullptr) {}
+string Deploy::stringToLog()
+{
+    string b = target->getTerritoryName();
+    string a = "Deployed "+to_string(numberOfArmy)+ " armies to " + b + ".\n";
+    return a;
+}
+
+Advance::Advance() : Order(), numberOfArmy(0), source(nullptr), target(nullptr) { this->typeID = 1; }
 
 Advance::Advance(Player* issuer, int numberOfArmies, Territory* source, Territory* destination)
         : Order(issuer, 4), numberOfArmy(numberOfArmies), source(source), target(destination) {}
@@ -277,6 +285,11 @@ bool Advance::validate() const
     bool validSourceTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), source) != currentPlayerTerritories.end();
     bool hasAnyArmiesToAdvance = source->getNumOfArmies() > 0;
     return validSourceTerritory && hasAnyArmiesToAdvance && canAttack(issuePlayer, target);
+}
+
+string Advance::stringToLog()
+{
+    return "Advance command executed.\n";
 }
 
 // Executes the AdvanceOrder.
@@ -330,12 +343,12 @@ void Advance::execute_()
         target->setNumOfArmies(target->getNumOfArmies()-movableArmiesFromSource);
         cout << "Advanced " << movableArmiesFromSource << " armies from " << source->getTerritoryName() << " to " << target->getTerritoryName() << "." << endl;
     }
-
+    Notify(this);
 }
 
 Advance::~Advance()= default;
 
-Bomb::Bomb() : Order(), target(nullptr) {}
+Bomb::Bomb() : Order(), target(nullptr) { this->typeID = 2; }
 
 Bomb::Bomb(Player* issuer, Territory* target) : Order(issuer, 4), target(target) {}
 
@@ -388,11 +401,18 @@ void Bomb::execute_()
     target->setNumOfArmies(target->getNumOfArmies()- (armiesOnTarget / 2));
     cout << "Bombed " << armiesOnTarget / 2 << " enemy armies on " << target->getTerritoryName() << ". ";
     cout << target->getNumOfArmies() << " remaining." << endl;
+
+    Notify(this);
 }
 
 Bomb::~Bomb() = default;
 
-Blockade::Blockade() : Order(nullptr, 3), territory(nullptr) {}
+string Bomb::stringToLog()
+{
+    return "Bomb command executed";
+}
+
+Blockade::Blockade() : Order(nullptr, 3), territory(nullptr) { this->typeID = 3; }
 
 Blockade::Blockade(Player* issuer, Territory* territory) : Order(issuer, 3), territory(territory) {}
 
@@ -443,11 +463,17 @@ void Blockade::execute_()
     territory->setTerritoryOwner(nullptr); // Neutral
     cout << "Blockade called on " << territory->getTerritoryOwner()->getPlayerID() << ". ";
     cout << territory->getNumOfArmies() << " neutral armies now occupy this territory." << endl;
+    Notify(this);
 }
 
 Blockade::~Blockade()  = default;
 
-Airlift::Airlift() : Order(nullptr, 2), numberOfArmy(0), source(nullptr), target(nullptr) {}
+string Blockade::stringToLog()
+{
+    return "Blockade command executed";
+}
+
+Airlift::Airlift() : Order(nullptr, 2), numberOfArmy(0), source(nullptr), target(nullptr) { this->typeID = 4; }
 
 Airlift::Airlift(Player* issuer, int numberOfArmies, Territory* source, Territory* destination)
         : Order(issuer, 2), numberOfArmy(numberOfArmies), source(source), target(destination) {}
@@ -508,11 +534,17 @@ void Airlift::execute_()
     target->setNumOfArmies(target->getNumOfArmies()+movableArmiesFromSource);
 
     cout << "Airlifted " << movableArmiesFromSource << " armies from " << source->getTerritoryName() << " to " << target->getTerritoryName() << "." << endl;
+    Notify(this);
 }
 
 Airlift ::~Airlift()  = default;
 
-Negotiate::Negotiate() : Order(), targetPlayer(nullptr) {}
+string Airlift::stringToLog()
+{
+    return "Airlift command executed: Airlifted  armies from " + source->getTerritoryName() +" to " + target->getTerritoryName()+"\n";
+}
+
+Negotiate::Negotiate() : Order(), targetPlayer(nullptr) { this->typeID = 5; }
 
 Negotiate::Negotiate(Player* issuer, Player* target) : Order(issuer, 4), targetPlayer(target) {}
 
@@ -561,9 +593,16 @@ void Negotiate::execute_()
     addDiplomaticRelation(issuePlayer);
     addDiplomaticRelation(targetPlayer);
     cout << "Negotiated diplomacy between " << issuePlayer->getPlayerID()<< " and " << targetPlayer->getPlayerID() << "." << endl;
+
+    Notify(this);
 }
 
 Negotiate :: ~Negotiate() = default;
+
+string Negotiate::stringToLog()
+{
+    return "Negotiate Command Executed: Player " + targetPlayer->getPlayerID() + " and Player " + issuePlayer->getPlayerID() + " have negotiated diplomacy.\n";
+}
 
 std::vector<Player*> Order::diplomaticRelations;
 
@@ -573,6 +612,11 @@ std::vector<Player*> Order::getDiplomaticRelations() {
 
 void Order::addDiplomaticRelation(Player* player) {
     diplomaticRelations.push_back(player);
+}
+
+string Order::stringToLog()
+{
+    return string();
 }
 
 

@@ -12,7 +12,7 @@
 #include<iostream>
 #include<vector>
 
-class Player;
+//class Player;
 
 // CARD CLASS ////////////////////////////////////////////
 class Card

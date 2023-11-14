@@ -4,7 +4,10 @@
 
 void testLoggingObserver() {
 	cout << "Testing CommandProcessing Observer" << endl;
-	testCommandProcessor();
+	//testCommandProcessor();
+	cout << "Testing Order Observer" << endl;
+	testOrderExecution();
+	cout << "Testing GameEngine Observer" << endl;
 	testGameStates();
 	
 }

@@ -5,13 +5,18 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "Map.h"
 #include "LoggingObserver.h"
+
+#include "Player.h"
 using namespace std;
 class Player;
-class Territory;
-class Map;
+//class Territory;
+//class Continent;
+//class Map;
 
-class Order{
+class Order : public Subject, public ILoggable
+{
 public:
     virtual ~Order();
     friend ostream &operator<<(ostream &output, const Order & order);
@@ -22,6 +27,8 @@ public:
     string getType();
     static std::vector<Player*> getDiplomaticRelations();
     static void addDiplomaticRelation(Player* player);
+    string stringToLog() override;
+    int typeID;
 
 protected:
     Order();
@@ -35,13 +42,13 @@ protected:
 private:
     int priority;
     vector<string> vecType = { "deploy", "advance", "bomb", "blockade", "airlift", "negotiate" };
-    int typeID;
+    //int typeID;
     void setTypeID(int num);
     static std::vector<Player*> diplomaticRelations;
     Map *gameMap;
 };
 
-class OrderList
+class OrderList : public Subject, public ILoggable
 {
 public:
 
@@ -55,9 +62,11 @@ public:
     void move(int position, int newPosition);
     OrderList& operator=(const OrderList& orderList);
     friend std :: ostream& operator<<(std::ostream& output, const OrderList &list);
+    string stringToLog() override;
+    std::vector<Order*> vec_order_list; //store the orders
 
 private:
-    std::vector<Order*> vec_order_list; //store the orders
+    //std::vector<Order*> vec_order_list; //store the orders
     std:: string effect = "effect printed from OrderList Object";
 };
 
@@ -71,7 +80,7 @@ public:
     void addArmies(int additional);
     bool validate() const;
     ~Deploy();
-
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -95,6 +104,7 @@ public:
     ~Advance();
 
     bool validate() const;
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -116,6 +126,7 @@ public:
     Order* clone() const;
     bool validate() const;
     ~Bomb();
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -135,6 +146,7 @@ public:
     Order* clone() const;
     bool validate() const;
     ~Blockade();
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -154,6 +166,7 @@ public:
     Order* clone() const;
     bool validate() const;
     ~Airlift();
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -175,6 +188,7 @@ public:
     Order* clone() const;
     bool validate() const;
     ~Negotiate();
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -185,3 +199,4 @@ private:
 };
 
 
+void testOrderExecution();

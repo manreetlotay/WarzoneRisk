@@ -5,7 +5,7 @@
 #include "Orders.h"
 #include "Player.h"
 #include "GameEngine.h"
-#include "Map.h"
+//#include "Map.h"
 
 using namespace std;
 
@@ -104,7 +104,7 @@ void testOrderExecution() {
     }
 
     // Show the OrderList after deleting an order at index 5
-    ordersList.remove(reinterpret_cast<Order *>(1));
+    ordersList.remove(ordersList.vec_order_list.at(5));
     std::cout << "\n===== " << "Orders list after deleting an order: " << ordersList << " =====" << std::endl;
     for (const auto &order : *ordersList.get_order_list())
     {
@@ -125,7 +125,7 @@ void testOrderExecution() {
     delete t3;
 
 }
-int main() {
-    testOrderExecution();
-    return 0;
-}
+//int main() {
+//    testOrderExecution();
+//    return 0;
+//}

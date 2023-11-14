@@ -73,6 +73,7 @@ public:
     void showTerritories();
     void showContinents();
     void getADJTerritories(string);
+    bool isADJ(string,string);
     vector<Territory*> getTerritoryList();
     vector<Continent*> continentsOwnedByPlayer(Player* player);
 };

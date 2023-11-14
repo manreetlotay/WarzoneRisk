@@ -2,7 +2,7 @@
 //#include "Player.h"
 #include "GameEngine.h"
 #include "CommandProcessing.h"
-#include "LoggingObserver.h"
+//#include "LoggingObserver.h"
 using namespace std;
 
 int main() {
@@ -14,6 +14,8 @@ int main() {
     //testGameStates();
     //testCommandProcessor();
     testLoggingObserver();
-    testGameStates();
+    //testGameStates();
+    //testMainGameLoop();
+    //testOrderExecution();
     
 }

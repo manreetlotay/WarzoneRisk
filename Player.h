@@ -8,10 +8,11 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 #include <string>
 #include "Cards.h"
 #include "Orders.h"
-#include "Map.h"
+//#include "Map.h"
 #include <iomanip>
 
-
+class Order;
+class OrderList;
 class Player {
 
 private:

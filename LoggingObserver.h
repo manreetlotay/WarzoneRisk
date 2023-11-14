@@ -1,4 +1,6 @@
 #pragma once
+
+
 #include <list>
 #include <string>
 
@@ -46,3 +48,4 @@ class LogObserver:public Observer
 
 // free function
 void testLoggingObserver();
+
