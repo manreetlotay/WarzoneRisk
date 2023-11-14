@@ -8,10 +8,16 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 
 using namespace std;
 
+//jsut for me
+void mainGameLoop();
+void reinforcementPhase();
+        void issueOrdersPhase();
+        void executeOrdersPhase();
+
 
 void testPlayers() {
 
-    //Testing for Player begins
+    //Testing for Player begins (ASSIGNMENT 1)
     std::cout << "TESTING THE FEATURES OF A PLAYER: " << std::endl;
 
     //Create a Deck of Card Objects, a Hand* of Card objects and populate the Hand* with repeated calls to the Draw() method
@@ -61,12 +67,12 @@ void testPlayers() {
     std::cout << *playerDefault << std::endl;
 
     //Instantiate a Player object with the parameterized constructor using handOfCards and orderList
-    Player* player = new Player(handOfCards, orderList, territoryList);
+    Player* player = new Player(handOfCards, orderList, territoryList, "manreet");
 
     //Testing issueOrder() method
-    player->issueOrder(&deploy);
-    player->issueOrder(&advance);
-    player->issueOrder(&airlift);
+    player->addOrderToOrderList(&deploy);
+    player->addOrderToOrderList(&advance);
+    player->addOrderToOrderList(&airlift);
 
     //Testing parameterized constructor
     std::cout << "The following player was instantiated using the parameterized constructor: " << std::endl;

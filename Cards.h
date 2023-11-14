@@ -12,6 +12,7 @@
 #include<iostream>
 #include<vector>
 
+//class Player;
 
 // CARD CLASS ////////////////////////////////////////////
 class Card
@@ -33,6 +34,8 @@ class Card
         friend std::ostream& operator<<(std::ostream& stream, const Card& acard);       // Stream operator
 
         void Play();                                        // Play() method
+
+        
 };
 ///////////////////////////////////////////////////////////
 

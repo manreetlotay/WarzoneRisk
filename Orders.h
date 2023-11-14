@@ -4,11 +4,19 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <string>
+#include "Map.h"
+#include "LoggingObserver.h"
+
+#include "Player.h"
 using namespace std;
 class Player;
-class Territory;
+//class Territory;
+//class Continent;
+//class Map;
 
-class Order{
+class Order : public Subject, public ILoggable
+{
 public:
     virtual ~Order();
     friend ostream &operator<<(ostream &output, const Order & order);
@@ -17,6 +25,10 @@ public:
     virtual bool validate() const = 0;
     int getPriority() const;
     string getType();
+    static std::vector<Player*> getDiplomaticRelations();
+    static void addDiplomaticRelation(Player* player);
+    string stringToLog() override;
+    int typeID;
 
 protected:
     Order();
@@ -30,11 +42,13 @@ protected:
 private:
     int priority;
     vector<string> vecType = { "deploy", "advance", "bomb", "blockade", "airlift", "negotiate" };
-    int typeID;
+    //int typeID;
     void setTypeID(int num);
+    static std::vector<Player*> diplomaticRelations;
+    Map *gameMap;
 };
 
-class OrderList
+class OrderList : public Subject, public ILoggable
 {
 public:
 
@@ -48,9 +62,11 @@ public:
     void move(int position, int newPosition);
     OrderList& operator=(const OrderList& orderList);
     friend std :: ostream& operator<<(std::ostream& output, const OrderList &list);
+    string stringToLog() override;
+    std::vector<Order*> vec_order_list; //store the orders
 
 private:
-    std::vector<Order*> vec_order_list; //store the orders
+    //std::vector<Order*> vec_order_list; //store the orders
     std:: string effect = "effect printed from OrderList Object";
 };
 
@@ -63,7 +79,8 @@ public:
     Order* clone() const;
     void addArmies(int additional);
     bool validate() const;
-
+    ~Deploy();
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -75,12 +92,19 @@ private:
 };
 
 class Advance : public Order{
-    Advance();
-    Advance(Player* issuer, int numberOfArmy, Territory* source, Territory* target);
     Advance(const Advance &order);
     const Advance &operator=(const Advance &order);
     Order* clone() const;
+
+public:
+    Advance();
+
+    Advance(Player* issuer, int numberOfArmy, Territory* source, Territory* target);
+
+    ~Advance();
+
     bool validate() const;
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -101,6 +125,8 @@ public:
     const Bomb &operator=(const Bomb &order);
     Order* clone() const;
     bool validate() const;
+    ~Bomb();
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -119,6 +145,8 @@ public:
     const Blockade &operator=(const Blockade &order);
     Order* clone() const;
     bool validate() const;
+    ~Blockade();
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -137,6 +165,8 @@ public:
     const Airlift &operator=(const Airlift &order);
     Order* clone() const;
     bool validate() const;
+    ~Airlift();
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -157,6 +187,8 @@ public:
     const Negotiate &operator=(const Negotiate &order);
     Order* clone() const;
     bool validate() const;
+    ~Negotiate();
+    string stringToLog() override;
 
 protected:
     void execute_();
@@ -167,4 +199,4 @@ private:
 };
 
 
-#endif //TEST_ORDERTEST_H
+void testOrderExecution();

@@ -3,38 +3,37 @@
 //
 
 #include "Orders.h"
-#include "Map.h"
-#include "Player.h"
 #include <algorithm>
 #include <iterator>
 #include <math.h>
 
-namespace
+
+
+// Custom comparator to sort Orders by priority
+bool compareOrders(Order* order1, Order* order2)
 {
-    // Custom comparator to sort Orders by priority
-    bool compareOrders(Order* order1, Order* order2)
-    {
-        return order1->getPriority() < order2->getPriority();
-    }
-
-    // Helper function to check whether a territory can be attacked by a specific player.
-    // Returns `true` if the attacker already owns the target territory
-    // OR
-    // if there is no diplomacy between the attacker and the owner of the target.
-    bool canAttack(Player* attacker, Territory* target)
-    {
-        Player* ownerOfTarget = target->getTerritoryOwner(); ;
-        vector<Player*> diplomaticRelations = attacker->getDiplomaticRelations();
-        bool diplomacyWithOwnerOfTarget = find(diplomaticRelations.begin(), diplomaticRelations.end(), ownerOfTarget) != diplomaticRelations.end();
-
-        if (diplomacyWithOwnerOfTarget)
-        {
-            cout << attacker->getPlayerName() << " and " << ownerOfTarget << " cannot attack each other for the rest of this turn. ";
-        }
-
-        return attacker == ownerOfTarget || !diplomacyWithOwnerOfTarget;
-    }
+    return order1->getPriority() < order2->getPriority();
 }
+
+// Helper function to check whether a territory can be attacked by a specific player.
+// Returns `true` if the attacker already owns the target territory
+// OR
+// if there is no diplomacy between the attacker and the owner of the target.
+bool canAttack(Player* attacker, Territory* target)
+{
+    Player* ownerOfTarget = target->getTerritoryOwner();
+    std::vector<Player*> diplomaticRelations = Order::getDiplomaticRelations();
+    bool diplomacyWithOwnerOfTarget = find(diplomaticRelations.begin(), diplomaticRelations.end(), ownerOfTarget) != diplomaticRelations.end();
+
+    if (diplomacyWithOwnerOfTarget)
+    {
+        cout << attacker->getPlayerID() << " and " << ownerOfTarget << " cannot attack each other for the rest of this turn. ";
+    }
+
+    return attacker == ownerOfTarget || !diplomacyWithOwnerOfTarget;
+}
+
+
 
 Order::Order(): issuePlayer(nullptr), priority(4) {}
 
@@ -84,8 +83,13 @@ int Order::getPriority() const
     return priority;
 }
 
+Order::~Order() {
+}
+
 OrderList:: OrderList(){
     std :: cout<<"Orderlist object created"<<endl;
+    LogObserver* ob3 = new LogObserver();
+    Attach(ob3);
 }
 
 OrderList :: ~OrderList(){
@@ -98,9 +102,16 @@ OrderList :: OrderList(const OrderList& exsistingOrderList){
     this-> vec_order_list = exsistingOrderList.vec_order_list;
 }
 
+string OrderList::stringToLog()
+{
+    string a = vec_order_list.back()->getType();
+    return "Order " + a + " has been added";
+}
+
 void OrderList::set_order_list(Order* an_order)
 {
     vec_order_list.push_back(an_order); //add an order
+    Notify(this);
 }
 
 vector<Order*>* OrderList::get_order_list()
@@ -136,26 +147,29 @@ void OrderList::move(int position, int newPosition)
     }
 }
 
+
 OrderList& OrderList ::operator=(const OrderList& orderList){
     this->vec_order_list = orderList.vec_order_list;
     return *this;
 }
 
-std :: ostream& operator<<(std::ostream& output, const OrderList &list){
-    std:: vector<Order*> temp = list.vec_order_list;
-    for (int i = 0; !temp.empty(); i++){
+std::ostream& operator<<(std::ostream& output, const OrderList &list) {
+    std::vector<Order*> temp = list.vec_order_list;
+    for (int i = 0; !temp.empty(); i++) {
         Order* obj = temp.front();
-        cout<<to_string(i)<< endl;
-        cout<<*obj<<endl;
+        cout << to_string(i) << endl;
+        cout << *obj << endl;
+        temp.erase(temp.begin()); // Remove the printed order from the temp vector
     }
     return output;
 }
 
 void OrderList::addOrder(Order *order) {
     vec_order_list.push_back(order);
+    Notify(this);
 }
 
-Deploy::Deploy() : Order(nullptr, 1), numberOfArmy(0), target(nullptr) {}
+Deploy::Deploy() : Order(nullptr, 1), numberOfArmy(0), target(nullptr) { this->typeID = 0; } // Check the typeID for Observer
 
 Deploy::Deploy(Player* issuer, int numberOfArmies, Territory* destination) : Order(issuer, 1), numberOfArmy(numberOfArmies), target(destination) {}
 
@@ -201,20 +215,28 @@ bool Deploy::validate() const
     {
         return false;
     }
-
     vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
     return find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), target) != currentPlayerTerritories.end();
 }
-
 
 // Executes the DeployOrder.
 void Deploy::execute_()
 {
     target->setNumOfArmies(numberOfArmy);
     cout << "Deployed " << numberOfArmy << " armies to " << target->getTerritoryName() << "." << endl;
+    Notify(this);
 }
 
-Advance::Advance() : Order(), numberOfArmy(0), source(nullptr), target(nullptr) {}
+Deploy::~Deploy()= default;
+
+string Deploy::stringToLog()
+{
+    string b = target->getTerritoryName();
+    string a = "Deployed "+to_string(numberOfArmy)+ " armies to " + b + ".\n";
+    return a;
+}
+
+Advance::Advance() : Order(), numberOfArmy(0), source(nullptr), target(nullptr) { this->typeID = 1; }
 
 Advance::Advance(Player* issuer, int numberOfArmies, Territory* source, Territory* destination)
         : Order(issuer, 4), numberOfArmy(numberOfArmies), source(source), target(destination) {}
@@ -259,20 +281,20 @@ bool Advance::validate() const
     }
 
     vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
+    //bool hasAdjacent = source->isADJ(source->getTerritoryName(), target->getTerritoryName());
     bool validSourceTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), source) != currentPlayerTerritories.end();
     bool hasAnyArmiesToAdvance = source->getNumOfArmies() > 0;
-
     return validSourceTerritory && hasAnyArmiesToAdvance && canAttack(issuePlayer, target);
+}
+
+string Advance::stringToLog()
+{
+    return "Advance command executed.\n";
 }
 
 // Executes the AdvanceOrder.
 void Advance::execute_()
 {
-
-    if (!map->isAdjacent(source->getTerritoryName(), target->getTerritoryName())) {
-        std::cout << "Advance order is invalid - territories are not adjacent." << std::endl;
-        return;
-    }
 
     Player* defender = target->getTerritoryOwner();
     bool offensive = issuePlayer != defender;
@@ -307,11 +329,12 @@ void Advance::execute_()
         }
         else
         {
-            auto pos = std::find(defender->getTerritoryList().begin(), defender->getTerritoryList().end(), target->getTerritoryName());
-            issuePlayer->getTerritoryList().push_back(target);
-            defender->getTerritoryList().erase(defender->getTerritoryList().begin() + pos);
+            //auto pos = std::find(defender->getTerritoryList().begin(), defender->getTerritoryList().end(), target->getTerritoryName());
+            //issuePlayer->getTerritoryList().push_back(target);
+            //defender->getTerritoryList().erase(defender->getTerritoryList().begin()+pos);
             target->setNumOfArmies(target->getNumOfArmies()+survivingAttackers);
             cout << "Successful attack on " << target->getTerritoryName() << ". " << survivingAttackers << " armies now occupy this territory." << endl;
+
         }
     }
     else
@@ -320,10 +343,12 @@ void Advance::execute_()
         target->setNumOfArmies(target->getNumOfArmies()-movableArmiesFromSource);
         cout << "Advanced " << movableArmiesFromSource << " armies from " << source->getTerritoryName() << " to " << target->getTerritoryName() << "." << endl;
     }
-
+    Notify(this);
 }
 
-Bomb::Bomb() : Order(), target(nullptr) {}
+Advance::~Advance()= default;
+
+Bomb::Bomb() : Order(), target(nullptr) { this->typeID = 2; }
 
 Bomb::Bomb(Player* issuer, Territory* target) : Order(issuer, 4), target(target) {}
 
@@ -364,6 +389,7 @@ bool Bomb::validate() const
     }
 
     vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
+    //bool isAdjacent = target->isADJ(target->getTerritoryName(), issuePlayer->getTerritoryList());
     bool validTargetTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), target) == currentPlayerTerritories.end();
     return validTargetTerritory && canAttack(issuePlayer, target);
 }
@@ -375,9 +401,18 @@ void Bomb::execute_()
     target->setNumOfArmies(target->getNumOfArmies()- (armiesOnTarget / 2));
     cout << "Bombed " << armiesOnTarget / 2 << " enemy armies on " << target->getTerritoryName() << ". ";
     cout << target->getNumOfArmies() << " remaining." << endl;
+
+    Notify(this);
 }
 
-Blockade::Blockade() : Order(nullptr, 3), territory(nullptr) {}
+Bomb::~Bomb() = default;
+
+string Bomb::stringToLog()
+{
+    return "Bomb command executed";
+}
+
+Blockade::Blockade() : Order(nullptr, 3), territory(nullptr) { this->typeID = 3; }
 
 Blockade::Blockade(Player* issuer, Territory* territory) : Order(issuer, 3), territory(territory) {}
 
@@ -425,12 +460,20 @@ bool Blockade::validate() const
 void Blockade::execute_()
 {
     territory->setNumOfArmies(territory->getNumOfArmies());
-    GameEngine::assignToNeutralPlayer(territory_);
-    cout << "Blockade called on " << territory_->getName() << ". ";
-    cout << territory_->getNumberOfArmies() << " neutral armies now occupy this territory." << endl;
+    territory->setTerritoryOwner(nullptr); // Neutral
+    cout << "Blockade called on " << territory->getTerritoryOwner()->getPlayerID() << ". ";
+    cout << territory->getNumOfArmies() << " neutral armies now occupy this territory." << endl;
+    Notify(this);
 }
 
-Airlift::Airlift() : Order(nullptr, 2), numberOfArmy(0), source(nullptr), target(nullptr) {}
+Blockade::~Blockade()  = default;
+
+string Blockade::stringToLog()
+{
+    return "Blockade command executed";
+}
+
+Airlift::Airlift() : Order(nullptr, 2), numberOfArmy(0), source(nullptr), target(nullptr) { this->typeID = 4; }
 
 Airlift::Airlift(Player* issuer, int numberOfArmies, Territory* source, Territory* destination)
         : Order(issuer, 2), numberOfArmy(numberOfArmies), source(source), target(destination) {}
@@ -491,9 +534,17 @@ void Airlift::execute_()
     target->setNumOfArmies(target->getNumOfArmies()+movableArmiesFromSource);
 
     cout << "Airlifted " << movableArmiesFromSource << " armies from " << source->getTerritoryName() << " to " << target->getTerritoryName() << "." << endl;
+    Notify(this);
 }
 
-Negotiate::Negotiate() : Order(), targetPlayer(nullptr) {}
+Airlift ::~Airlift()  = default;
+
+string Airlift::stringToLog()
+{
+    return "Airlift command executed: Airlifted  armies from " + source->getTerritoryName() +" to " + target->getTerritoryName()+"\n";
+}
+
+Negotiate::Negotiate() : Order(), targetPlayer(nullptr) { this->typeID = 5; }
 
 Negotiate::Negotiate(Player* issuer, Player* target) : Order(issuer, 4), targetPlayer(target) {}
 
@@ -513,7 +564,7 @@ ostream &Negotiate::print_(ostream &output) const
 
     if (issuePlayer != nullptr && targetPlayer != nullptr)
     {
-        output << " Initiator: " << issuePlayer->getPlayerName() << ", Target: " << targetPlayer->getPlayerName();
+        output << " Initiator: " << issuePlayer->getPlayerID() << ", Target: " << targetPlayer->getPlayerID();
     }
 
     return output;
@@ -539,9 +590,33 @@ bool Negotiate::validate() const
 // Executes the NegotiateOrder.
 void Negotiate::execute_()
 {
-    issuePlayer->addDiplomaticRelation(targetPlayer);
-    targetPlayer->addDiplomaticRelation(issuePlayer);
-    cout << "Negotiated diplomacy between " << issuePlayer->getPlayerName()<< " and " << targetPlayer->getPlayerName() << "." << endl;
+    addDiplomaticRelation(issuePlayer);
+    addDiplomaticRelation(targetPlayer);
+    cout << "Negotiated diplomacy between " << issuePlayer->getPlayerID()<< " and " << targetPlayer->getPlayerID() << "." << endl;
+
+    Notify(this);
+}
+
+Negotiate :: ~Negotiate() = default;
+
+string Negotiate::stringToLog()
+{
+    return "Negotiate Command Executed: Player " + targetPlayer->getPlayerID() + " and Player " + issuePlayer->getPlayerID() + " have negotiated diplomacy.\n";
+}
+
+std::vector<Player*> Order::diplomaticRelations;
+
+std::vector<Player*> Order::getDiplomaticRelations() {
+    return diplomaticRelations;
+}
+
+void Order::addDiplomaticRelation(Player* player) {
+    diplomaticRelations.push_back(player);
+}
+
+string Order::stringToLog()
+{
+    return string();
 }
 
 
