@@ -235,7 +235,7 @@ void Player::issueOrder() {
     cout << playerID << ",  HERE ARE THE TERRITORIES YOU NEED TO DEFEND:\n" << endl;
 
     for (int i = 0; i < toDefend.size(); i++) {
-        cout << i + 1 << ". TERRITORY: "  << toDefend[i]->getTerritoryName() << " (ARMIES: " << toDefend[i]->getNumOfArmies() << ")\n";
+        cout << i + 1 << ". TERRITORY: "  << toDefend[i]->getTerritoryName() << endl; //" (ARMIES: " << toDefend[i]->getNumOfArmies() << ")\n";
     }
     cout << endl;
 
@@ -258,10 +258,13 @@ void Player::issueOrder() {
                 }
             } while (numDeployed < 0 || numDeployed > this->reinforcementPool);
 
-            // // Create a Deploy order
-            // Deploy* deployOrder = new Deploy(this, numDeployed, targetTerritory);
+            //Create a Deploy order
+            //Deploy* deploy = new Deploy(this, numDeployed, targetTerritory);
             // // Add the order to the player's order list
-            // addOrderToOrderList(deployOrder);
+            //addOrderToOrderList(deploy);
+
+            // cout << "Priniting player's order list" << endl;
+            // cout << *this << endl;
 
             // Update the number of armies in the target territory
             targetTerritory->setNumOfArmies(targetTerritory->getNumOfArmies() + numDeployed);
@@ -325,7 +328,7 @@ void Player::issueOrder() {
                 // Display the territories to defend
                 cout << "HERE IS A LIST OF YOUR TERRITORIES:\n" << endl;
                 for (int i = 0; i < toDefend.size(); i++) {
-                    cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << "   Armies: " << toDefend[i]->getNumOfArmies() << endl;
+                    cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << endl; //"   Armies: " << toDefend[i]->getNumOfArmies() << endl;
                 }
                 int fromChoice;
                 do {
@@ -369,7 +372,7 @@ void Player::issueOrder() {
 
                 // Advance* advanceOrder = new Advance(this, numUnitsToAdvance, fromTerritory, toTerritory);
                 // addOrderToOrderList(advanceOrder);
-                // fromTerritory->setNumOfArmies(fromTerritory->getNumOfArmies() - numUnitsToAdvance);
+                //fromTerritory->setNumOfArmies(fromTerritory->getNumOfArmies() - numUnitsToAdvance);
 
                 cout << "\nADVANCE ORDER #" << orderNumber << " ISSUED: " << numUnitsToAdvance << " units advanced from " << fromTerritory->getTerritoryName() << " to " << toTerritory->getTerritoryName() << "." << endl;
             
@@ -379,7 +382,7 @@ void Player::issueOrder() {
                 // Display the territories to defend
                 cout << "HERE IS A LIST OF YOUR TERRITORIES:\n" << endl;
                 for (int i = 0; i < toDefend.size(); i++) {
-                    cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << "      Armies: " << toDefend[i]->getNumOfArmies() << endl;
+                    cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << endl; //"      Armies: " << toDefend[i]->getNumOfArmies() << endl;
                 }
 
 
@@ -478,6 +481,7 @@ void Player::issueOrder() {
                 //Bomb Order
                 targetTerritory = toAttack.front();
                 //order = new Bomb(this, targetTerritory);
+                //addOrderToOrderList(&order);
                 cout << "ISSUE BOMB ORDER ON " << targetTerritory->getTerritoryName() << ", OWNED BY " << targetTerritory->getTerritoryOwner()->getPlayerID() << endl;
                 break;
             case 'R':
@@ -488,6 +492,7 @@ void Player::issueOrder() {
                 //Blockade Order
                 targetTerritory = toDefend.front();
                 //order = new Blockade(this, targetTerritory);
+                //addOrderToOrderList(&order);
                 cout << "ISSUE BLOCKADE ORDER ON " << targetTerritory->getTerritoryName() << ", OWNED BY " << targetTerritory->getTerritoryOwner()->getPlayerID() << endl;
                 break;
             case 'A':
@@ -501,6 +506,7 @@ void Player::issueOrder() {
 
                 numArmies = (rand() % movedArmies) + 1;
                 //order = new Airlift(this, numArmies, sourceTerritory, targetTerritory);
+                //addOrderToOrderList(&order);
                 cout << "ISSUE AIRLIFT ORDER FROM " << sourceTerritory->getTerritoryName() << " TO " << targetTerritory->getTerritoryName() << ", OWNED BY " << this->getPlayerID() << endl;
 
                 break;
@@ -508,6 +514,7 @@ void Player::issueOrder() {
                 //Negotiate Order
                 targetPlayer = toAttack.front()->getTerritoryOwner();
                 //order = new Negotiate(this, targetPlayer);
+                //addOrderToOrderList(&order);
                 cout << "ISSUE NEGOTIATE ORDER ON PLAYER " << targetPlayer->getPlayerID() << endl;
                 break;
             default:
