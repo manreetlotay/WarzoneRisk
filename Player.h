@@ -12,7 +12,7 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 #include "PlayerStrategies.h"
 #include <iomanip>
 
-//class PlayerStrategy;
+class PlayerStrategy;
 
 class Player {
 

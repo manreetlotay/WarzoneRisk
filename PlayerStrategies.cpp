@@ -31,6 +31,19 @@
 
     vector <Territory*> HumanPlayerStrategy::toDefend() {
         cout << "Human Player toDefend" << endl;
+
+        p->getTerritoryList();
+
+         // //initialize terrToDefend with the Player's territoryList
+    // vector<Territory*> terrToDefend(territoryList.begin(), territoryList.end());
+
+    // //sort terrToDefend vector in ascending order of NumOfArmies on Territory
+    // std::sort(terrToDefend.begin(), terrToDefend.end(), [](Territory* a, Territory* b) {
+    //     return a->getNumOfArmies() < b->getNumOfArmies();
+    // });
+
+    // return terrToDefend;
+    
     }
 
     void HumanPlayerStrategy::issueOrder() {
