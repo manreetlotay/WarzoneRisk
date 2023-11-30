@@ -760,117 +760,30 @@ void GameEngine::removePlayers() {
 
 
 
-// void GameEngine::mainGameLoop() {
-
-//     int maxRounds = 5;
-//     int currentRound = 0; // Start from round 1
-//     Player* winner = nullptr;
-
-//     while (currentRound <= maxRounds) {
-//         reinforcementPhase();  // Implement this function
-//         issueOrdersPhase();    // Implement this function
-//         executeOrdersPhase();  // Implement this function
-
-//         // Check for a winner
-//         winner = checkWinner();
-//         if (winner) {
-//             cout << "PLAYER " << winner->getPlayerID() << " wins!" << endl;
-//             //break;
-//             exit(0);
-//         }
-
-//         // Manually remove a player's territories in round 2
-//         if (currentRound == 1) {
-//             if (!allPlayers.empty()) {
-//                 int randomIndex = rand() % allPlayers.size();  // Randomly choose a player
-//                 Player* playerToRemove = allPlayers[randomIndex];
-
-//                 // Remove all the player's territories
-//                 cout << "Removing territories from Player " << playerToRemove->getPlayerID() << endl;
-//                 playerToRemove->setTerritoryList(vector<Territory*>());
-
-//                 // Check for players with zero territories and remove them
-//                 removePlayers();
-//             }
-//         }
-
-//          // Simulate a player winning by owning all territories in round 3
-//         if (currentRound == 2) {
-//             // Choose a random player to give all territories
-//             int randomIndex = rand() % allPlayers.size();
-//             Player* playerToWin = allPlayers[randomIndex];
-
-//             // Assign all territories from the selectedMap to this player
-//             playerToWin->setTerritoryList(selectedMap.getTerritoryList());
-//             cout << "setting player's territoryList to map territories" << endl;
-//         }
-
-//         currentRound++;
-//     }
-
-//     if (!winner) {
-//         cout << "The game ends in a tie. No winner." << endl;
-//     }
-// }
-
-
-
-
 void GameEngine::mainGameLoop() {
-    int maxRounds = 5;
+
+    int maxRounds = 30;
     int currentRound = 0; // Start from round 1
     Player* winner = nullptr;
-    bool gameEnded = false; // Flag to track whether the game has ended
 
     while (currentRound <= maxRounds) {
-        // Check for a winner before starting the round
-        if (!gameEnded) {
-            if (currentRound == 1) {
-                // Manually remove a player's territories in round 1
-                if (!allPlayers.empty()) {
-                    int randomIndex = rand() % allPlayers.size();  // Randomly choose a player
-                    Player* playerToRemove = allPlayers[randomIndex];
 
-                    // Remove all the player's territories
-                    cout << "Removing territories from Player " << playerToRemove->getPlayerID() << endl;
-                    playerToRemove->setTerritoryList(vector<Territory*>());
+        // Check for players with zero territories and remove them
+        removePlayers();
 
-                    // Check for players with zero territories and remove them
-                    removePlayers();
-                }
-            } else if (currentRound == 2 ) {
-                // Simulate a player winning by owning all territories in round 2
-                int randomIndex = rand() % allPlayers.size();
-                Player* playerToWin = allPlayers[randomIndex];
-
-                // Assign all territories from the selectedMap to this player
-                playerToWin->setTerritoryList(selectedMap.getTerritoryList());
-                cout << "Setting player's territoryList to map territories" << endl;
-
-                // Check for a winner
-                cout << "checking for winner" << endl;
-                winner = checkWinner();
-                if (winner) {
-                    cout << "PLAYER " << winner->getPlayerID() << " wins!" << endl;
-                    gameEnded = true;  // Set the flag to indicate the game has ended
-                    exit(0);
-                }
-            }
-
+        // Check for a winner
+        winner = checkWinner();
+        if (winner) {
+            cout << "PLAYER " << winner->getPlayerID() << " wins!" << endl;
+            //break;
+            exit(0);
         }
 
-        if (!gameEnded) {
-            // Reinforcement phase
-            reinforcementPhase();  // Implement this function
 
-            // Issue orders phase
-            issueOrdersPhase();  // Implement this function
+        reinforcementPhase();  
+        issueOrdersPhase();    
+        executeOrdersPhase();  
 
-            // Execute orders phase
-            executeOrdersPhase();  // Implement this function
-        }
-
-        // Increment the round
         currentRound++;
     }
 
@@ -878,6 +791,72 @@ void GameEngine::mainGameLoop() {
         cout << "The game ends in a tie. No winner." << endl;
     }
 }
+
+
+
+
+// void GameEngine::mainGameLoop() {
+//     int maxRounds = 5;
+//     int currentRound = 0; // Start from round 1
+//     Player* winner = nullptr;
+//     bool gameEnded = false; // Flag to track whether the game has ended
+
+//     while (currentRound <= maxRounds) {
+//         // Check for a winner before starting the round
+//         if (!gameEnded) {
+//             if (currentRound == 1) {
+//                 // Manually remove a player's territories in round 1
+//                 if (!allPlayers.empty()) {
+//                     int randomIndex = rand() % allPlayers.size();  // Randomly choose a player
+//                     Player* playerToRemove = allPlayers[randomIndex];
+
+//                     // Remove all the player's territories
+//                     cout << "Removing territories from Player " << playerToRemove->getPlayerID() << endl;
+//                     playerToRemove->setTerritoryList(vector<Territory*>());
+
+//                     // Check for players with zero territories and remove them
+//                     removePlayers();
+//                 }
+//             } else if (currentRound == 2 ) {
+//                 // Simulate a player winning by owning all territories in round 2
+//                 int randomIndex = rand() % allPlayers.size();
+//                 Player* playerToWin = allPlayers[randomIndex];
+
+//                 // Assign all territories from the selectedMap to this player
+//                 playerToWin->setTerritoryList(selectedMap.getTerritoryList());
+//                 cout << "Setting player's territoryList to map territories" << endl;
+
+//                 // Check for a winner
+//                 cout << "checking for winner" << endl;
+//                 winner = checkWinner();
+//                 if (winner) {
+//                     cout << "PLAYER " << winner->getPlayerID() << " wins!" << endl;
+//                     gameEnded = true;  // Set the flag to indicate the game has ended
+//                     exit(0);
+//                 }
+//             }
+
+//         }
+
+//         if (!gameEnded) {
+//             // Reinforcement phase
+//             reinforcementPhase();  // Implement this function
+
+//             // Issue orders phase
+//             issueOrdersPhase();  // Implement this function
+
+//             // Execute orders phase
+//             executeOrdersPhase();  // Implement this function
+//         }
+
+//         // Increment the round
+//         currentRound++;
+//     }
+
+//     if (!winner) {
+//         cout << "The game ends in a tie. No winner." << endl;
+//     }
+// }
 
 
 

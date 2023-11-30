@@ -78,7 +78,7 @@
         vector<Territory*> toAttack = this->toAttack();
         bool deployedAll = false;
 
-        //Ensure the player still has territories to defend
+        //Ensure the player still has territories to defend (still in the game)
         if (toDefend.empty() || p->getReinforcementPool() <= 0) {
             return;
         }
@@ -376,7 +376,7 @@
 
             // Remove the used card from the player's hand
             this->p->getHandOfCards()->hand.erase(this->p->getHandOfCards()->hand.begin() + cardChoice - 1);
-            
+
     }
 
 
@@ -400,12 +400,185 @@
     vector <Territory*> AggressivePlayerStrategy::toAttack() {
         cout << "Aggressive Player toAttack" << endl;
 
+         vector<Territory*> terrToAttack;
+
+        //Loop through the Player's territoryList
+        for (Territory* territory : this->p->getTerritoryList()) {
+
+            //Get adjacent territories of the current territory
+            vector<Territory*> adjacentTerritories = territory->adjencyList;
+
+            //Loop through the adjacent territories
+            for (Territory* adjacentTerritory : adjacentTerritories) {
+
+                //Check if the adjacent territory is not owned by the player
+                    if (adjacentTerritory->getTerritoryOwner() != p) {
+                        //Prevent duplicates in terrToAttack
+                        if (find(terrToAttack.begin(), terrToAttack.end(), adjacentTerritory) == terrToAttack.end()) {
+                            terrToAttack.push_back(adjacentTerritory);
+                        }
+                    }
+                }
+            }
+
+        // Sort terrToAttack vector in ascneding order of NumOfArmies on Territory
+        sort(terrToAttack.begin(), terrToAttack.end(), [](Territory* a, Territory* b) {
+            return a->getNumOfArmies() < b->getNumOfArmies();  //front = Territory with lowest numOfArmies  //back = Territory with highest numOfArmies
+        });
+
+        return terrToAttack;
+
     }
+
 
     vector <Territory*> AggressivePlayerStrategy::toDefend() {
         cout << "Aggressive Player toDefend" << endl;
+
+        vector<Territory*> terrList = this->p->getTerritoryList();
+
+        //initialize terrToDefend with the Player's territoryList
+         vector<Territory*> terrToDefend(terrList.begin(), terrList.end());
+
+        //sort terrToDefend vector in ascending order of NumOfArmies on Territory
+        sort(terrToDefend.begin(), terrToDefend.end(), [](Territory* a, Territory* b) {
+            return a->getNumOfArmies() < b->getNumOfArmies();
+        });
+
+        return terrToDefend; //front = Territory with lowest numOfArmies  //back = Territory with highest numOfArmies
+
     }
 
+
     void AggressivePlayerStrategy::issueOrder() {
+
+        //====Computer Player that always deployes and advances armies to its strong territories, then advances armies from its strongest Territory to the weakest enemy Territory, then uses any aggressive card====//
         cout << "Aggressive Player issueOrder" << endl;
+
+        vector<Territory*> toDefend = this->toDefend();
+        vector<Territory*> toAttack = this->toAttack();
+        Territory* myStrongestTerritory = toDefend.back();
+	    Territory* weakestEnemyTerritory = toAttack.front();
+        Territory* strongestEnemyTerritory = toAttack.back();
+        bool deployedAll = false;
+
+        //Ensure the player still has territories to defend (still in the game)
+        if (toDefend.empty() || p->getReinforcementPool() <= 0) {
+            return;
+        }
+
+        //========================================DEPLOY=====================================//
+            // Deploys all its armies to its strongest Territory
+        int numDeployed = this->p->getReinforcementPool();
+        //Deploy* deploy = new Deploy(this, numDeployed, myStrongestTerritory);
+        //addOrderToOrderList(deploy);
+
+        // Update the number of armies in the target territory
+        myStrongestTerritory->setNumOfArmies(myStrongestTerritory->getNumOfArmies() + numDeployed);
+
+        // Remove deployed army units from the reinforcement pool
+        this->p->removeReinforcements(numDeployed);
+
+        cout << "\n" << this->p->getPlayerID() << " deployed " << numDeployed << " army units to " << myStrongestTerritory->getTerritoryName() << endl;
+
+
+
+        //========================================ADVANCE=====================================//
+            // Advance all army units to strongest Territory if other territories than the strongest have any army units, else advance units from strongest territory to enemy territory
+        Territory* fromTerritory = nullptr;
+        Territory* toTerritory = nullptr;
+        int unitsAdvanced = 0;
+        
+        for (int i = 0; i < toDefend.size(); i++) {
+            if (toDefend[i]->getNumOfArmies() != 0 && toDefend[i] != myStrongestTerritory) {
+                Territory* fromTerritory = toDefend[i];
+                unitsAdvanced = fromTerritory->getNumOfArmies();
+                myStrongestTerritory->setNumOfArmies(myStrongestTerritory->getNumOfArmies() + unitsAdvanced);
+                // Advance* advanceOrder = new Advance(this, unitsAdvanced, fromTerritory, myStrongestTerritory); (line above gets removed b/c part of order execution)
+                // addOrderToOrderList(advanceOrder);
+                fromTerritory->setNumOfArmies(fromTerritory->getNumOfArmies() - unitsAdvanced); //this line is also part of order execution
+            }
+            else {
+                unitsAdvanced = myStrongestTerritory->getNumOfArmies();
+                weakestEnemyTerritory->setNumOfArmies(weakestEnemyTerritory->getNumOfArmies() + unitsAdvanced);
+                // Advance* advanceOrder = new Advance(this, unitsAdvanced, myStrongestTerritory, weakestEnemyTerritory); (line above gets removed b/c part of order execution)
+                // addOrderToOrderList(advanceOrder);
+                myStrongestTerritory->setNumOfArmies(myStrongestTerritory->getNumOfArmies() - unitsAdvanced); //this line is also part of order execution 
+            }
+        }
+
+
+
+        //===========================================CARD=======================================//
+        
+        // Check if the player has any cards in their hand
+        if (this->p->getHandOfCards() == nullptr || this->p->getHandOfCards()->hand.empty()) {
+            return;
+        }
+
+
+        // Loop through player's handOfCards and use each card
+        for (int i = 0; i < this->p->getHandOfCards()->hand.size(); i++) {
+            //Use the selected card based on its type
+            Territory* targetTerritory = nullptr;
+            Territory* sourceTerritory = nullptr;
+            Player* targetPlayer = nullptr;
+            int numArmies = 0;
+            int movedArmies = 0;
+            
+            //use the card agressively based on its type
+            switch(this->p->getHandOfCards()->hand[i]->getValue()) {
+                case 'B':
+                    //Bomb Order
+                    targetTerritory = weakestEnemyTerritory;
+                    //order = new Bomb(this, targetTerritory);
+                    //addOrderToOrderList(&order);
+                    cout << "PLAYING BOMB CARD ON " << targetTerritory->getTerritoryName() << ", OWNED BY " << targetTerritory->getTerritoryOwner()->getPlayerID() << endl;
+                    break;
+                case 'R':
+                    //this->reinforcementPool += 10;
+                    this->p->addReinforcements(10);
+                    cout << "PLAYING REINFORCEMENT CARD" << endl;  
+                    break;
+                case 'L':
+                    //Blockade Order
+                    targetTerritory = toDefend.front();
+                    //order = new Blockade(this, targetTerritory);
+                    //addOrderToOrderList(&order);
+                    cout << "PLAYING BLOCKADE CARD ON " << targetTerritory->getTerritoryName() << ", OWNED BY " << targetTerritory->getTerritoryOwner()->getPlayerID() << endl;
+                    break;
+                case 'A':
+                    //Airlift order
+                    sourceTerritory = toDefend.back();
+                    targetTerritory = myStrongestTerritory;
+
+                    if (sourceTerritory != targetTerritory) {
+                        if (sourceTerritory->getNumOfArmies() <= 0) {
+                        movedArmies = 1;
+                        }
+
+                        numArmies = (rand() % movedArmies) + 1;
+                        //order = new Airlift(this, numArmies, sourceTerritory, targetTerritory);
+                        //addOrderToOrderList(&order);
+                        cout << "PLAYING AIRLIFT CARD FROM " << sourceTerritory->getTerritoryName() << " TO " << targetTerritory->getTerritoryName() << ", OWNED BY " << this->p->getPlayerID() << endl;
+                    }
+                    
+                    break;
+                case 'D':
+                    //Negotiate Order
+                    targetPlayer = strongestEnemyTerritory->getTerritoryOwner();
+                    //order = new Negotiate(this, targetPlayer);
+                    //addOrderToOrderList(&order);
+                    cout << "PLAYING NEGOTIATE CARD ON PLAYER " << targetPlayer->getPlayerID() << endl;
+                    break;
+                default:
+                    cout << "**Invalid card type. Please try again.**" << endl;
+                    break;
+
+            }
+
+            // Remove all used cards from the player's hand
+            this->p->getHandOfCards()->hand.clear();
+
+        }
+
     }
