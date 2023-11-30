@@ -500,7 +500,7 @@ void GameEngine::startupPhase() {
             }
         }
 
-        //Prompt user to enter names for each player
+        //Prompt user to enter names for each player and choose strategy for each player
         cout << "\nGREAT! NOW THAT YOU'VE RALLIED YOUR FORCES, IT'S TIME TO BESTOW UNIQUE TITLES UPON EACH WARRIOR IN YOUR ARMY. CHOOSE A NAME FOR EVERY PLAYER, AND LET THEIR LEGEND BEGIN!\n" << endl;
         for (int i = 0; i < numPlayers; i++) {
             string playerName;
@@ -552,24 +552,11 @@ void GameEngine::startupPhase() {
                         cout << "**Invalid Choice. Please Try Again!**" << endl;
                         break;
             }
-            //Set player Strategy
-
-            // Create an instance of a concrete strategy, let's say HumanPlayerStrategy
-// PlayerStrategy* strategy = new HumanPlayerStrategy(player);
-
-// // Set the strategy for the player
-// player->setStrategy(strategy);
 
         }
 
         cout << "\nGREAT JOB! THOSE ARE SOME FANTASTIC NAMES FOR YOUR BATTLE-HARDENED COMRADES.\n" << endl;
 
-        //Store players in allPayers
-        // for (int i = 0; i < numPlayers; i++) {
-        //     Player* newPlayer = new Player();
-        //     newPlayer->setPlayerID(playerNames[i]);
-        //     allPlayers.push_back(newPlayer);
-        // }
 
         cout << "\nWARRIORS, YOU HAVE ALL BEEN GRANTED YOUR FAIR SHARE OF TERRITORIES. SURVEY THE LANDS UNDER YOUR DOMINION AND THOSE THAT STAND AS THE REALMS OF YOUR FOES.\n" << endl;
 

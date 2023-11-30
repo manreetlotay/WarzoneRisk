@@ -12,5 +12,6 @@ int main() {
     //testOrdersList();
     //testGameStates();
     testMainGameLoop();
+    //testPlayerStrategies();
     
 }

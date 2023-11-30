@@ -55,3 +55,6 @@ public:
     vector<Territory*> toDefend() override;
 
 };
+
+//free function declaration
+void testPlayerStrategies();
