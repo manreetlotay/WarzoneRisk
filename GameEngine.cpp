@@ -524,17 +524,52 @@ void GameEngine::startupPhase() {
             }
 
             playerNames.push_back(playerName);
+            Player* newPlayer = nullptr;
+            PlayerStrategy* strategy = nullptr;
+
+            switch(playerStrategyChoice) {
+                case 1: 
+                        newPlayer = new Player();
+                        newPlayer->setPlayerID(playerNames[i]);
+                        strategy = new HumanPlayerStrategy(newPlayer);
+                        newPlayer->setStrategy(strategy);
+                        allPlayers.push_back(newPlayer);
+                        break;
+                case 2:
+                        newPlayer = new Player();
+                        newPlayer->setPlayerID(playerNames[i]);
+                        strategy = new AggressivePlayerStrategy(newPlayer);
+                        newPlayer->setStrategy(strategy);
+                        allPlayers.push_back(newPlayer);
+                        break;
+                case 3:
+                        break;
+                case 4:
+                        break;
+                case 5:
+                        break;
+                default:
+                        cout << "**Invalid Choice. Please Try Again!**" << endl;
+                        break;
+            }
             //Set player Strategy
+
+            // Create an instance of a concrete strategy, let's say HumanPlayerStrategy
+// PlayerStrategy* strategy = new HumanPlayerStrategy(player);
+
+// // Set the strategy for the player
+// player->setStrategy(strategy);
+
         }
 
         cout << "\nGREAT JOB! THOSE ARE SOME FANTASTIC NAMES FOR YOUR BATTLE-HARDENED COMRADES.\n" << endl;
 
         //Store players in allPayers
-        for (int i = 0; i < numPlayers; i++) {
-            Player* newPlayer = new Player();
-            newPlayer->setPlayerID(playerNames[i]);
-            allPlayers.push_back(newPlayer);
-        }
+        // for (int i = 0; i < numPlayers; i++) {
+        //     Player* newPlayer = new Player();
+        //     newPlayer->setPlayerID(playerNames[i]);
+        //     allPlayers.push_back(newPlayer);
+        // }
 
         cout << "\nWARRIORS, YOU HAVE ALL BEEN GRANTED YOUR FAIR SHARE OF TERRITORIES. SURVEY THE LANDS UNDER YOUR DOMINION AND THOSE THAT STAND AS THE REALMS OF YOUR FOES.\n" << endl;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 #include <vector>
 
 using namespace std;
@@ -10,14 +11,14 @@ class Territory;
 //Strategy Class
 class PlayerStrategy {   
 
-    private:
+    protected:
         string strategyName;
         Player* p;
 
     public:
         //constructor and destructor
-        PlayerStrategy();
-        ~PlayerStrategy();
+        PlayerStrategy(Player* p);
+        virtual ~PlayerStrategy();
 
         //methods
         virtual void issueOrder() = 0;
@@ -29,27 +30,27 @@ class PlayerStrategy {
 //Concrete Strategy Classes
 
 class HumanPlayerStrategy : public PlayerStrategy {
-
+public:
     //Constructor and Destructor
-    HumanPlayerStrategy();
+    HumanPlayerStrategy(Player* p);
     ~HumanPlayerStrategy();
 
     //methods
-    void issueOrder();
-    vector<Territory*> toAttack();
-    vector<Territory*> toDefend();
+    void issueOrder() override;
+    vector<Territory*> toAttack() override;
+    vector<Territory*> toDefend() override;
 
 };
 
 class AggressivePlayerStrategy : public PlayerStrategy {
-
+public:
     //Constructor and Destructor
-    AggressivePlayerStrategy();
+    AggressivePlayerStrategy(Player* p);
     ~AggressivePlayerStrategy();
 
     //methods
-    void issueOrder();
-    vector<Territory*> toAttack();
-    vector<Territory*> toDefend();
+    void issueOrder() override;
+    vector<Territory*> toAttack() override;
+    vector<Territory*> toDefend() override;
 
 };

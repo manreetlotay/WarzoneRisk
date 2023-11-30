@@ -9,8 +9,10 @@ AUTHOR: Manreet Kaur Lotay (40202883)
 #include "Cards.h"
 #include "Orders.h"
 #include "Map.h"
+#include "PlayerStrategies.h"
 #include <iomanip>
 
+//class PlayerStrategy;
 
 class Player {
 
@@ -20,6 +22,7 @@ class Player {
         vector<Territory*> territoryList;
         string playerID;
         int reinforcementPool;
+        PlayerStrategy* ps;
 
 
     public:
@@ -54,6 +57,7 @@ class Player {
         void setTerritoryList(vector<Territory*> newTerritoryList);
         void setPlayerID(string newPlayerID);
         void setReinforcementPool(int newReinforcementPool);
+        void setStrategy(PlayerStrategy* newStrategy);
 
         //Other
         void printTerritoryList(vector<Territory*> terrListToPrint);
