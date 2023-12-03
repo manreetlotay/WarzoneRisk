@@ -1,6 +1,7 @@
 #include"GameEngine.h"
 #include <string>
 #include <vector>
+#include <algorithm>
 
 /*
 commands to implement:
@@ -311,7 +312,7 @@ bool GameEngine::win() {
 
         }
     } while (flag);
-
+    return true;
 
 }
 //void GameEngine::play() {
@@ -566,7 +567,7 @@ void GameEngine::startupPhase() {
         //Shuffle the territories randomly
         std::random_device rd;
         std::mt19937 g(rd());
-        random_shuffle(territories.begin(), territories.end());
+        shuffle(territories.begin(), territories.end(), g);
 
         //Set armies on territory to 0 initially
         for (Territory* terr: territories) {
@@ -623,7 +624,7 @@ void GameEngine::startupPhase() {
         }
 
         // Randomize the order of players
-        random_shuffle(allPlayers.begin(), allPlayers.end());
+        shuffle(allPlayers.begin(), allPlayers.end(),g);
 
         cout << "ALL PLAYERS HAVE DRAWN TWO CARDS FROM THE DECK AND HAVE BEEN ASSIGNED 50 ARMY UNITS\n" << endl;
         cout << "TAKE A LOOK AT YOUR BATTLE KIT!\n" << endl;

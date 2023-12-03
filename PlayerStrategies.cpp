@@ -179,7 +179,7 @@
                     // Display the territories to defend
                     cout << "HERE IS A LIST OF YOUR TERRITORIES:\n" << endl;
                     for (int i = 0; i < toDefend.size(); i++) {
-                        cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << endl; //"   Armies: " << toDefend[i]->getNumOfArmies() << endl;
+                        cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << "   Armies: " << toDefend[i]->getNumOfArmies() << endl;
                     }
                     int fromChoice;
                     do {
@@ -233,7 +233,7 @@
                     // Display the territories to defend
                     cout << "HERE IS A LIST OF YOUR TERRITORIES:\n" << endl;
                     for (int i = 0; i < toDefend.size(); i++) {
-                        cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << endl; //"      Armies: " << toDefend[i]->getNumOfArmies() << endl;
+                        cout << i + 1 << ". Territory Name: " << toDefend[i]->getTerritoryName() << "      Armies: " << toDefend[i]->getNumOfArmies() << endl;
                     }
 
 
@@ -255,7 +255,7 @@
 
                     cout << "HERE IS A LIST OF ENEMY TERRITORIES TO ATTACK:\n" << endl;
                     for (int i = 0; i < toAttack.size(); i++) {
-                        cout << i + 1 << ". Territory Name: " << toAttack[i]->getTerritoryName() << "     Owner: " << toAttack[i]->getTerritoryOwner()->getPlayerID() << endl;
+                        cout << i + 1 << ". Territory Name: " << toAttack[i]->getTerritoryName() << "     Owner: " << toAttack[i]->getTerritoryOwner()->getPlayerID() << "      Armies: "<<toAttack[i]->getNumOfArmies() << endl;
                     }
 
                     do {
@@ -581,4 +581,26 @@
 
         }
 
+
+
     }
+
+//====================BENEVOLENT PLAYER=====================
+// // Constructor
+// BenevolentPlayerStrategy::BenevolentPlayerStrategy(Player *p) : PlayerStrategy(p){
+//     cout<<"I am an Benevolent Player" <<endl;
+
+// } 
+
+// // Destructor
+// BenevolentPlayerStrategy::~BenevolentPlayerStrategy() {
+//     delete p;
+//     p = NULL;
+// }
+
+// vector <Territory*> AggressivePlayerStrategy::toAttack() {
+   
+//     cout << "Aggressive Player toAttack" << endl;
+
+//     vector<Territory*> terrToAttack;
+// }
