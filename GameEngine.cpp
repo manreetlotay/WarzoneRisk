@@ -547,7 +547,13 @@ void GameEngine::startupPhase() {
                 case 4:
                         break;
                 case 5:
+                        newPlayer = new Player();
+                        newPlayer->setPlayerID(playerNames[i]);
+                        strategy = new CheaterPlayerStrategy(newPlayer);
+                        newPlayer->setStrategy(strategy);
+                        allPlayers.push_back(newPlayer);
                         break;
+                        
                 default:
                         cout << "**Invalid Choice. Please Try Again!**" << endl;
                         break;

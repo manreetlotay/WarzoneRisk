@@ -582,3 +582,55 @@
         }
 
     }
+
+    //====================CHEATER PLAYER=====================
+
+    CheaterPlayerStrategy::CheaterPlayerStrategy(Player* p) : PlayerStrategy(p)
+    {
+        cout << "I am a Cheater Player" << endl;
+    }
+
+    CheaterPlayerStrategy::~CheaterPlayerStrategy() {
+        delete p;
+        p = NULL;
+    }
+
+    void CheaterPlayerStrategy::issueOrder() {
+        cout << "Cheater Player issuing orders" << endl;
+
+        vector<Territory*> territoriesToConquer;
+        for (Territory* territory : this->p->getTerritoryList()) {
+            //Get adjacent territories of the current territory
+            vector<Territory*> adjacentTerritories = territory->adjencyList;
+
+            for (Territory* adjacentTerritory : adjacentTerritories) {
+                // check if adjecent territory is not already owned by the player
+                if (adjacentTerritory->getTerritoryOwner() != p)
+                {
+                    cout << "Cheater Player conquering territory: " << adjacentTerritory->getTerritoryName() << endl;
+                    adjacentTerritory->setTerritoryOwner(p);
+                    territoriesToConquer.push_back(adjacentTerritory);
+                }
+
+            }
+        }
+        // get the current list of territories
+        vector<Territory*> territoryList = p->getTerritoryList();
+        for (Territory* CT : territoriesToConquer) {
+            // Add the conquered territories to the current list
+            territoryList.push_back(CT);
+        }
+        // set the list of territories
+        p->setTerritoryList(territoryList);
+    }
+
+    vector<Territory*> CheaterPlayerStrategy::toAttack()
+    {
+        return vector<Territory*>();
+    }
+
+    vector<Territory*> CheaterPlayerStrategy::toDefend()
+    {
+        return vector<Territory*>();
+    }
+

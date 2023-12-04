@@ -221,6 +221,11 @@ void Player::addOrderToOrderList(Order* order) {
     orderList->set_order_list(order);
 }
 
+void Player::addTerritoryToList(Territory* t)
+{
+    this->territoryList.push_back(t);
+}
+
 //create Order object and add it to player's list of orders
 void Player::issueOrder() {
 if (ps!=nullptr)
