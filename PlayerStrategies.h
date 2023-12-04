@@ -68,6 +68,17 @@ class BenevolentPlayerStrategy : public PlayerStrategy{
     vector<Territory*> toDefend() override;
 
 };
+class NeutralPlayerStrategy : public PlayerStrategy {
 
+public:
+    NeutralPlayerStrategy(Player* p);
+    ~NeutralPlayerStrategy();
+
+    //methods
+    void issueOrder() override;
+    vector<Territory*> toAttack() override;
+    vector<Territory*> toDefend() override;
+
+};
 //free function declaration
 void testPlayerStrategies();
