@@ -281,10 +281,10 @@ bool Advance::validate() const
     }
 
     vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
-    //bool hasAdjacent = source->isADJ(source->getTerritoryName(), target->getTerritoryName());
+    bool hasAdjacent = source->isAdj(source, target);
     bool validSourceTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), source) != currentPlayerTerritories.end();
     bool hasAnyArmiesToAdvance = source->getNumOfArmies() > 0;
-    return validSourceTerritory && hasAnyArmiesToAdvance && canAttack(issuePlayer, target);
+    return validSourceTerritory && hasAnyArmiesToAdvance && canAttack(issuePlayer, target) && hasAdjacent;
 }
 
 string Advance::stringToLog()
@@ -329,9 +329,17 @@ void Advance::execute_()
         }
         else
         {
-            //auto pos = std::find(defender->getTerritoryList().begin(), defender->getTerritoryList().end(), target->getTerritoryName());
-            //issuePlayer->getTerritoryList().push_back(target);
-            //defender->getTerritoryList().erase(defender->getTerritoryList().begin()+pos);
+            auto it = std::find_if(defender->getTerritoryList().begin(), defender->getTerritoryList().end(),
+                                   [this](const Territory* t) { return t->getTerritoryName() == this->target->getTerritoryName(); });
+
+            if (it != defender->getTerritoryList().end()) {
+                issuePlayer->getTerritoryList().push_back(this->target);
+                defender->getTerritoryList().erase(it);
+                this->target->setNumOfArmies(this->target->getNumOfArmies() + survivingAttackers);
+            }
+
+
+            target->setNumOfArmies(target->getNumOfArmies() + survivingAttackers);
             target->setNumOfArmies(target->getNumOfArmies()+survivingAttackers);
             cout << "Successful attack on " << target->getTerritoryName() << ". " << survivingAttackers << " armies now occupy this territory." << endl;
 
@@ -389,9 +397,9 @@ bool Bomb::validate() const
     }
 
     vector<Territory*> currentPlayerTerritories = issuePlayer->getTerritoryList();
-    //bool isAdjacent = target->isADJ(target->getTerritoryName(), issuePlayer->getTerritoryList());
+    bool isAdjacent = target->isAdj(target, reinterpret_cast<Territory *>(issuePlayer));
     bool validTargetTerritory = find(currentPlayerTerritories.begin(), currentPlayerTerritories.end(), target) == currentPlayerTerritories.end();
-    return validTargetTerritory && canAttack(issuePlayer, target);
+    return validTargetTerritory && canAttack(issuePlayer, target) && isAdjacent;
 }
 
 // Executes the BombOrder.

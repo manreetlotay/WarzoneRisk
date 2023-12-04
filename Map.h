@@ -40,7 +40,7 @@ public:
     void setContinent(Continent*);
     Continent* getContinent();
     void setTerritoryName(string name);
-    string getTerritoryName();
+    string getTerritoryName() const;
     void setTerritoryOwner(Player*);
     Player* getTerritoryOwner();
     int getNumOfArmies();
@@ -48,7 +48,7 @@ public:
 
     vector<Territory*> adjencyList; // Track adjacent territories
     bool operator==(const Territory& other) const; // Override == operator to compare Territories
-    
+    bool isAdj(Territory* t1, Territory* t2);
 };
 
 

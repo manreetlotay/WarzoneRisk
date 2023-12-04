@@ -69,7 +69,7 @@ Continent* Territory::getContinent(){
 void Territory::setContinent(Continent* c){
     continent = c;
 }
-string Territory::getTerritoryName(){
+string Territory::getTerritoryName() const {
     return this -> territoryName;
 }
 void Territory::setTerritoryName(string name){
@@ -90,7 +90,11 @@ void Territory::setNumOfArmies(int num){
 bool Territory::operator==(const Territory& other) const {
     return territoryName == other.territoryName;
 }
-
+bool Territory::isAdj(Territory* t1, Territory* t2)
+{
+    auto it = find_if(t1->adjencyList.begin(), t1->adjencyList.end(), [&t2](Territory* cont) {return cont->getTerritoryName() == t2->getTerritoryName();});
+    return (it != t1->adjencyList.end());
+}
 
 Map::Map(/* args */)
 {
@@ -368,3 +372,4 @@ bool Map::isADJ(string name1, string name2)
     auto it = find_if(t1->adjencyList.begin(), t1->adjencyList.end(), [&name2](Territory* cont) {return cont->getTerritoryName() == name2; });
     return (it != t1->adjencyList.end()) ? true : false;
 }
+
