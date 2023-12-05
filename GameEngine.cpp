@@ -612,7 +612,19 @@ void GameEngine::startupPhase() {
 
 		cout << "\n" << endl;
 	}
-
+	if (territories.size() % numPlayers != 0)
+	{
+		cout << setw(25) << left << "Territory" << setw(25) << "Continent" << "Owner" << endl;
+		cout << "_____________________________________________________________________________" << endl;
+		for (Territory* territory : territories) {
+			if (territory->getTerritoryOwner() == NULL) {
+				cout << setw(25) << left << territory->getTerritoryName();
+				cout << setw(25) << left << territory->getContinent()->getContinentName();
+				cout << setw(25) << left << "UNCLAIMED" << endl;
+			}
+		}
+		cout << "\n" << endl;
+	}
 
 	// Assign 50 army units to each player
 	for (Player* player : allPlayers) {
@@ -750,7 +762,7 @@ void GameEngine::executeOrdersPhase() {
 Player* GameEngine::checkWinner() {
 	//Iterate through all players and check if any player owns all territories
 	for (Player* player : allPlayers) {
-		if (player->getTerritoryList().size() == numDistributedTerritories) {
+		if (player->getTerritoryList().size() == selectedMap.getTerritoryList().size()) {
 			return player;
 		}
 	}
@@ -795,7 +807,7 @@ void GameEngine::mainGameLoop() {
 			exit(0);
 		}
 
-
+		cout << "Round " << currentRound + 1 << endl;
 		reinforcementPhase();
 		issueOrdersPhase();
 		executeOrdersPhase();

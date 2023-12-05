@@ -51,6 +51,8 @@ class Player {
         vector<Territory*> getTerritoryList();
         string getPlayerID();
         int getReinforcementPool();
+        string getPlayerStrategy();
+
 
         //setters
         void setHand(Hand* newHandOfCards);
@@ -58,6 +60,7 @@ class Player {
         void setPlayerID(string newPlayerID);
         void setReinforcementPool(int newReinforcementPool);
         void setStrategy(PlayerStrategy* newStrategy);
+        void setNeutralGotAttacked(bool flag);
 
         //Other
         void printTerritoryList(vector<Territory*> terrListToPrint);

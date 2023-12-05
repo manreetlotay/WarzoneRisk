@@ -8,11 +8,23 @@ PlayerStrategy::PlayerStrategy(Player* p) : p(p) {}
 // Destructor
 PlayerStrategy::~PlayerStrategy() {}
 
+string PlayerStrategy::getPlayerStrategy(){
+	return this->strategyName;
+}
+void PlayerStrategy::setAttacked(bool wasAttacked) {
+	this->gotAttacked = wasAttacked;
+}
+
+bool PlayerStrategy::getWasNeutralAttacked() {
+	return this->gotAttacked;
+}
+
 //====================HUMAN PLAYER========================
 
 // Constructor
 HumanPlayerStrategy::HumanPlayerStrategy(Player* p) : PlayerStrategy(p)
 {
+	this->strategyName = "Human";
 	cout << "I am a Human Player" << endl;
 }
 
@@ -433,6 +445,7 @@ void HumanPlayerStrategy::issueOrder()
 // Constructor
 AggressivePlayerStrategy::AggressivePlayerStrategy(Player* p) : PlayerStrategy(p)
 {
+	this->strategyName = "Aggressive";
 	cout << "I am an Aggressive Player" << endl;
 }
 
@@ -536,7 +549,8 @@ void AggressivePlayerStrategy::issueOrder()
 	Territory* fromTerritory = nullptr;
 	Territory* toTerritory = nullptr;
 	int unitsAdvanced = 0;
-
+	//string weakestEnemyStrategyType = weakestEnemyTerritory->getTerritoryOwner()->getPlayerStrategy();
+	string weakestEnemyStrategyType = " ";
 	for (int i = 0; i < toDefend.size(); i++)
 	{
 		if (toDefend[i]->getNumOfArmies() != 0 && toDefend[i] != myStrongestTerritory)
@@ -548,15 +562,55 @@ void AggressivePlayerStrategy::issueOrder()
 			// addOrderToOrderList(advanceOrder);
 			fromTerritory->setNumOfArmies(fromTerritory->getNumOfArmies() - unitsAdvanced); // this line is also part of order execution
 		}
-		else
-		{
-			unitsAdvanced = myStrongestTerritory->getNumOfArmies();
-			weakestEnemyTerritory->setNumOfArmies(weakestEnemyTerritory->getNumOfArmies() + unitsAdvanced);
-			// Advance* advanceOrder = new Advance(this, unitsAdvanced, myStrongestTerritory, weakestEnemyTerritory); (line above gets removed b/c part of order execution)
-			// addOrderToOrderList(advanceOrder);
-			myStrongestTerritory->setNumOfArmies(myStrongestTerritory->getNumOfArmies() - unitsAdvanced); // this line is also part of order execution
+
+	}
+	unitsAdvanced = myStrongestTerritory->getNumOfArmies();
+
+	if (weakestEnemyTerritory->getTerritoryOwner() == NULL) {
+		cout << weakestEnemyTerritory->getTerritoryName() << " IS UNCLAIMED." << endl;
+
+		myStrongestTerritory->setNumOfArmies(myStrongestTerritory->getNumOfArmies() - unitsAdvanced);
+		weakestEnemyTerritory->setNumOfArmies(unitsAdvanced);
+		weakestEnemyTerritory->setTerritoryOwner(p);
+		vector<Territory*> temp = this->p->getTerritoryList();
+		temp.push_back(weakestEnemyTerritory);
+		this->p->setTerritoryList(temp);
+		cout << "Player " << p->getPlayerID() << " has captured " << weakestEnemyTerritory->getTerritoryName() << endl;
+
+	}
+	else {
+		weakestEnemyStrategyType = weakestEnemyTerritory->getTerritoryOwner()->getPlayerStrategy();
+		if (weakestEnemyStrategyType == "Neutral") {
+			cout << "Attacking a Neutral Player" << endl;
+			weakestEnemyTerritory->getTerritoryOwner()->setNeutralGotAttacked(true);
+		}
+
+		if (weakestEnemyTerritory->getNumOfArmies() < myStrongestTerritory->getNumOfArmies()) {
+			weakestEnemyTerritory->setNumOfArmies(unitsAdvanced - weakestEnemyTerritory->getNumOfArmies());
+			myStrongestTerritory->setNumOfArmies(myStrongestTerritory->getNumOfArmies() - unitsAdvanced);
+
+			//remove territory from the enemy
+			vector<Territory*> temp = weakestEnemyTerritory->getTerritoryOwner()->getTerritoryList();
+			temp.erase(remove(temp.begin(), temp.end(), weakestEnemyTerritory), temp.end());
+			weakestEnemyTerritory->getTerritoryOwner()->setTerritoryList(temp);
+			// add territory to player		
+			weakestEnemyTerritory->setTerritoryOwner(this->p);
+			temp = this->p->getTerritoryList();
+			temp.push_back(weakestEnemyTerritory);
+			this->p->setTerritoryList(temp);
+			cout << "Player " << p->getPlayerID() << " has captured " << weakestEnemyTerritory->getTerritoryName() << endl;
+		}
+		else{
+			weakestEnemyTerritory->setNumOfArmies(unitsAdvanced - weakestEnemyTerritory->getNumOfArmies());
+			myStrongestTerritory->setNumOfArmies(myStrongestTerritory->getNumOfArmies() - unitsAdvanced);
 		}
 	}
+
+	
+	//weakestEnemyTerritory->setNumOfArmies(weakestEnemyTerritory->getNumOfArmies() + unitsAdvanced);
+	// Advance* advanceOrder = new Advance(this, unitsAdvanced, myStrongestTerritory, weakestEnemyTerritory); (line above gets removed b/c part of order execution)
+	// addOrderToOrderList(advanceOrder);
+	 // this line is also part of order execution
 
 	//===========================================CARD=======================================//
 
@@ -638,6 +692,7 @@ void AggressivePlayerStrategy::issueOrder()
 // Constructor
 BenevolentPlayerStrategy::BenevolentPlayerStrategy(Player* p) : PlayerStrategy(p)
 {
+	this->strategyName = "Benevolent";
 	cout << "I am an Benevolent Player" << endl;
 }
 
@@ -683,7 +738,7 @@ void BenevolentPlayerStrategy::issueOrder() {
 	//vector<Territory *> toAttack = this->toAttack();
 
 	//The top of toDefent is always the country with the least number of armies
-	Territory* myWeakestTerritory = toDefend.front();
+	//Territory* myWeakestTerritory = toDefend.front();
 	bool deployedAll = false;
 
 	// Ensure the player still has territories to defend (still in the game)
@@ -691,7 +746,7 @@ void BenevolentPlayerStrategy::issueOrder() {
 	{
 		return;
 	}
-
+	Territory* myWeakestTerritory = toDefend.front();
 	//========================================DEPLOY=====================================//
    // Deploys all its armies to its strongest Territory
 	int numDeployed = this->p->getReinforcementPool();
@@ -731,14 +786,24 @@ void BenevolentPlayerStrategy::issueOrder() {
 
 	/* ---------------------TODO CARDS--------------------*/
 	//implement may use cards for non harmful purposes
+
+	// Check if the player has any cards in their hand
+	if (this->p->getHandOfCards() == nullptr || this->p->getHandOfCards()->hand.empty())
+	{
+		return;
+	}
+
+
 	/*--------------*/
 
 }
 /*------------------Neutral Player-------------*/
 
+// Constructor
 NeutralPlayerStrategy::NeutralPlayerStrategy(Player* p) : PlayerStrategy(p)
 {
-	cout << "I am an Benevolent Player" << endl;
+	this->strategyName = "Neutral";
+	cout << "I am an Neutral Player" << endl;
 }
 
 // Destructor
@@ -747,6 +812,18 @@ NeutralPlayerStrategy::~NeutralPlayerStrategy()
 	delete p;
 	p = NULL;
 }
+
+//void NeutralPlayerStrategy::setAttacked(bool wasAttacked) {
+//	this->gotAttacked = wasAttacked;
+//}
+//
+//bool NeutralPlayerStrategy::getWasNeutralAttacked() {
+//	return this->gotAttacked;
+//}
+
+// NeutralPlayerStrategy::NeutralPlayerStrategy(const NeutralPlayerStrategy& otherObj):PlayerStrategy(otherObj){
+	
+// }
 
 vector <Territory*> NeutralPlayerStrategy::toAttack() {
 
@@ -775,6 +852,10 @@ vector<Territory*> NeutralPlayerStrategy::toDefend(){
 
 void NeutralPlayerStrategy::issueOrder() {
 	//Neutral player does nothing until it gets attacked at which point it should become an aggressive player.
+	if (this->gotAttacked == true) {
+		cout << "HOW DARE YOU ATTACK ME! YOU SHALL KNOW MY RAGE, I SHALL UNLEASH MY WRATH APON THEE!" << endl;
+		cout << "Player " << p->getPlayerID() << " has become Aggressive" << endl;
+	}
 	vector<Territory*> toDefend = this->toDefend();
 
 	cout << "NUMBER OF ARMY UNITS AVAILABLE: " << this->p->getReinforcementPool() << endl;

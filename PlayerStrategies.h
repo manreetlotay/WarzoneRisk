@@ -14,6 +14,7 @@ class PlayerStrategy {
 
     protected:
         string strategyName;
+        bool gotAttacked = false;
         Player* p;
 
     public:
@@ -25,7 +26,9 @@ class PlayerStrategy {
         virtual void issueOrder() = 0;
         virtual vector<Territory*> toAttack() = 0;
         virtual vector<Territory*> toDefend() = 0;
-
+        string getPlayerStrategy();
+        void setAttacked(bool );
+        bool getWasNeutralAttacked();
 };
 
 //Concrete Strategy Classes
@@ -61,8 +64,12 @@ class BenevolentPlayerStrategy : public PlayerStrategy{
     public:
     BenevolentPlayerStrategy(Player* p);
     ~BenevolentPlayerStrategy();
+    BenevolentPlayerStrategy(const BenevolentPlayerStrategy& otherObj):PlayerStrategy(otherObj){};
+    
 
     //methods
+
+
     void issueOrder() override;
     vector<Territory*> toAttack() override;
     vector<Territory*> toDefend() override;
@@ -73,12 +80,17 @@ class NeutralPlayerStrategy : public PlayerStrategy {
 public:
     NeutralPlayerStrategy(Player* p);
     ~NeutralPlayerStrategy();
-
+    NeutralPlayerStrategy(const NeutralPlayerStrategy& otherObj):PlayerStrategy(otherObj){};
+    
     //methods
     void issueOrder() override;
     vector<Territory*> toAttack() override;
     vector<Territory*> toDefend() override;
 
+    //void setAttacked(bool);
+    //bool getWasNeutralAttacked();
+
 };
+
 //free function declaration
 void testPlayerStrategies();

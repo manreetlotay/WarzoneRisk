@@ -187,6 +187,11 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
  int Player::getReinforcementPool() {
     return reinforcementPool;
  }
+ string Player::getPlayerStrategy(){
+     string sName = "";
+     sName = ps->getPlayerStrategy();
+    return sName;
+ }
 
  //setters
  void Player::setHand(Hand* newHandOfCards) {
@@ -207,6 +212,10 @@ void Player::setReinforcementPool(int newReinforcementPool) {
 
 void Player::setStrategy(PlayerStrategy* newStrategy) {
     ps = newStrategy;
+}
+
+void Player::setNeutralGotAttacked(bool flag) {
+    ps->setAttacked(flag);
 }
 
 void Player::addReinforcements(int armyUnits) {
