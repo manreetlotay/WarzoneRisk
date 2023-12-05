@@ -188,6 +188,8 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
     return reinforcementPool;
  }
 
+
+
  //setters
  void Player::setHand(Hand* newHandOfCards) {
     handOfCards = newHandOfCards;
@@ -219,6 +221,11 @@ void Player::removeReinforcements(int armyUnits) {
 
 void Player::addOrderToOrderList(Order* order) {
     orderList->set_order_list(order);
+}
+
+void Player::addTerritoryToList(Territory* t)
+{
+    this->territoryList.push_back(t);
 }
 
 //create Order object and add it to player's list of orders

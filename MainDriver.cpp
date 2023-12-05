@@ -7,8 +7,8 @@ using namespace std;
 int main() {
 
   // testPlayers();
-   // testCards();
-    //dtestLoadMaps();
+   //testCards();
+    //testLoadMaps();
     //testOrdersList();
     //testGameStates();
     testMainGameLoop();

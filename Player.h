@@ -64,6 +64,8 @@ class Player {
         void addReinforcements(int armyUnits);
         void removeReinforcements(int armyUnits);
         void addOrderToOrderList(Order* order);
+        void addTerritoryToList(Territory*);
+        void removeTerritoryFromList();
 };
 
 //free function declaration

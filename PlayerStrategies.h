@@ -56,6 +56,19 @@ public:
 
 };
 
+class CheaterPlayerStrategy : public PlayerStrategy {
+public:
+    //Constructor and Destructor
+    CheaterPlayerStrategy(Player* p);
+    ~CheaterPlayerStrategy();
+
+    // methods
+    void issueOrder() override;
+    vector<Territory*> toAttack() override;
+    vector<Territory*> toDefend() override;
+
+};
+
 class BenevolentPlayerStrategy : public PlayerStrategy{
 
     public:

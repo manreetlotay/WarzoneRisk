@@ -791,4 +791,68 @@ void NeutralPlayerStrategy::issueOrder() {
 		cout << setw(25) << left << territory->getNumOfArmies() << endl;
 	}
 
-}
+    }
+
+    //====================CHEATER PLAYER=====================
+
+    CheaterPlayerStrategy::CheaterPlayerStrategy(Player* p) : PlayerStrategy(p)
+    {
+        cout << "I am a Cheater Player" << endl;
+    }
+
+    CheaterPlayerStrategy::~CheaterPlayerStrategy() {
+        delete p;
+        p = NULL;
+    }
+
+    void CheaterPlayerStrategy::issueOrder() {
+        cout << "Cheater Player issuing orders" << endl;
+
+        vector<Territory*> territoriesToConquer;
+        for (Territory* territory : this->p->getTerritoryList()) {
+            //Get adjacent territories of the current territory
+            vector<Territory*> adjacentTerritories = territory->adjencyList;
+
+            for (Territory* adjacentTerritory : adjacentTerritories) {
+                // check if adjecent territory is not already owned by the player
+                if (adjacentTerritory->getTerritoryOwner() != p)
+                {
+                    cout << "Cheater Player conquering territory: " << adjacentTerritory->getTerritoryName() << endl;
+                    adjacentTerritory->setTerritoryOwner(p);
+                    territoriesToConquer.push_back(adjacentTerritory);
+                }
+
+            }
+        }
+        // get the current list of territories
+        vector<Territory*> territoryList = p->getTerritoryList();
+        for (Territory* CT : territoriesToConquer) {
+            // Add the conquered territories to the current list
+            territoryList.push_back(CT);
+        }
+        // set the list of territories
+        p->setTerritoryList(territoryList);
+
+		cout << setw(25) << left << "Territory" << setw(24) << "Continent" << setw(24) << "Owner" << setw(24) << "Army units" << endl;
+		cout << "______________________________________________________________________________________" << endl;
+
+		for (Territory* territory : territoryList) {
+			cout << setw(25) << left << territory->getTerritoryName();
+			cout << setw(25) << left << territory->getContinent()->getContinentName();
+			cout << setw(25) << left << territory->getTerritoryOwner()->getPlayerID();
+			cout << setw(25) << left << territory->getNumOfArmies() << endl;
+		}
+		cout << endl;
+		cout << "Number of territories owned: " << territoryList.size() << endl;
+    }
+
+    vector<Territory*> CheaterPlayerStrategy::toAttack()
+    {
+        return vector<Territory*>();
+    }
+
+    vector<Territory*> CheaterPlayerStrategy::toDefend()
+    {
+        return vector<Territory*>();
+    }
+
