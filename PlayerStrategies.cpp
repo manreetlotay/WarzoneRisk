@@ -832,6 +832,18 @@ void NeutralPlayerStrategy::issueOrder() {
         }
         // set the list of territories
         p->setTerritoryList(territoryList);
+
+		cout << setw(25) << left << "Territory" << setw(24) << "Continent" << setw(24) << "Owner" << setw(24) << "Army units" << endl;
+		cout << "______________________________________________________________________________________" << endl;
+
+		for (Territory* territory : territoryList) {
+			cout << setw(25) << left << territory->getTerritoryName();
+			cout << setw(25) << left << territory->getContinent()->getContinentName();
+			cout << setw(25) << left << territory->getTerritoryOwner()->getPlayerID();
+			cout << setw(25) << left << territory->getNumOfArmies() << endl;
+		}
+		cout << endl;
+		cout << "Number of territories owned: " << territoryList.size() << endl;
     }
 
     vector<Territory*> CheaterPlayerStrategy::toAttack()

@@ -755,7 +755,7 @@ void GameEngine::executeOrdersPhase() {
 Player* GameEngine::checkWinner() {
 	//Iterate through all players and check if any player owns all territories
 	for (Player* player : allPlayers) {
-		if (player->getTerritoryList().size() == numDistributedTerritories) {
+		if (player->getTerritoryList().size() == selectedMap.getTerritoryList().size()) {
 			return player;
 		}
 	}

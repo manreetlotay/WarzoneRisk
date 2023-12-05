@@ -188,6 +188,8 @@ Player::Player(Hand* handOfCards, OrderList* orderList, vector<Territory*> terri
     return reinforcementPool;
  }
 
+
+
  //setters
  void Player::setHand(Hand* newHandOfCards) {
     handOfCards = newHandOfCards;
